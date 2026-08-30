@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig, fontProviders } from 'astro/config';
 import netlify from '@astrojs/netlify';
+import tailwindcss from '@tailwindcss/vite';
 
 // Content pages are static; only /api/* and /admin opt into on-demand rendering
 // via `export const prerender = false`.
@@ -10,20 +11,23 @@ export default defineConfig({
   site: process.env.PUBLIC_SITE_URL || 'https://example.org',
   output: 'static',
   adapter: netlify(),
+  vite: {
+    plugins: [tailwindcss()],
+  },
   fonts: [
     {
       provider: fontProviders.google(),
-      name: 'Fraunces',
-      cssVariable: '--font-display',
-      weights: [400, 600, 700],
+      name: 'Zilla Slab',
+      cssVariable: '--ff-display',
+      weights: [500, 600, 700],
       styles: ['normal'],
       subsets: ['latin'],
-      fallbacks: ['Georgia', 'serif'],
+      fallbacks: ['Rockwell', 'Georgia', 'serif'],
     },
     {
       provider: fontProviders.google(),
       name: 'Inter',
-      cssVariable: '--font-sans',
+      cssVariable: '--ff-sans',
       weights: [400, 500, 600, 700],
       styles: ['normal'],
       subsets: ['latin'],

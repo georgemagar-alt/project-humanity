@@ -83,28 +83,29 @@ const c = copy[lang];
 const blocks: Block[] = [c.whyAfrica, ...c.countries];
 ---
 
-<article class="prose">
-  <h1>{c.title}</h1>
-  <p class="lede">{c.intro}</p>
-  <p>
-    {c.campaignsNote}{' '}
-    <a href={localizePath('/spenden', lang)}>{lang === 'de' ? 'Spendenseite' : 'donation page'}</a>.
-  </p>
+<div class="container-page py-16 lg:py-20">
+  <article class="prose-page">
+    <p class="eyebrow">{lang === 'de' ? 'Unsere Arbeit' : 'Our work'}</p>
+    <h1 class="text-4xl sm:text-5xl font-bold mb-5">{c.title}</h1>
+    <p class="text-lg text-muted">{c.intro}</p>
+    <p>
+      {c.campaignsNote}{' '}
+      <a href={localizePath('/spenden', lang)}>{lang === 'de' ? 'Spendenseite' : 'donation page'}</a>.
+    </p>
 
-  {
-    blocks.map((block) => (
-      <section id={block.id}>
-        <h2>{block.heading}</h2>
-        {block.lead && (
-          <p>
-            <strong>{block.lead}</strong>
-          </p>
-        )}
-        {block.body.map((p) => (
-          <p>{p}</p>
-        ))}
-        {block.sources && <p class="bar__needed"><small>{block.sources}</small></p>}
-      </section>
-    ))
-  }
-</article>
+    {
+      blocks.map((block) => (
+        <section id={block.id}>
+          <h2>{block.heading}</h2>
+          {block.lead && (
+            <p class="text-lg font-semibold text-ink">{block.lead}</p>
+          )}
+          {block.body.map((p) => (
+            <p>{p}</p>
+          ))}
+          {block.sources && <p class="text-sm text-muted">{block.sources}</p>}
+        </section>
+      ))
+    }
+  </article>
+</div>

@@ -10,37 +10,41 @@ const strings = {
   sending: t('join.sending'),
   success: t('join.success'),
   error: t('join.error'),
-  submit: t('join.submit'),
 };
+const label = 'grid gap-1.5 font-semibold';
 ---
 
-<form class="stack" id="join-form" novalidate>
+<form class="grid gap-5 max-w-xl" id="join-form" novalidate>
   <input type="hidden" name="locale" value={lang} />
 
-  <label>
+  <label class={label}>
     {t('join.name')}
-    <input type="text" name="name" required autocomplete="name" />
+    <input type="text" name="name" required autocomplete="name" class="field" />
   </label>
-  <label>
+  <label class={label}>
     {t('join.email')}
-    <input type="email" name="email" required autocomplete="email" />
+    <input type="email" name="email" required autocomplete="email" class="field" />
   </label>
-  <label>
+  <label class={label}>
     {t('join.phone')}
-    <input type="tel" name="phone" autocomplete="tel" />
+    <input type="tel" name="phone" autocomplete="tel" class="field" />
   </label>
-  <label>
+  <label class={label}>
     {t('join.message')}
-    <textarea name="message"></textarea>
+    <textarea name="message" rows="4" class="field"></textarea>
   </label>
 
-  <!-- Honeypot: real users never fill this -->
   <div class="hp" aria-hidden="true">
     <label>Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
   </div>
 
-  <button type="submit" class="btn" id="join-submit">{t('join.submit')}</button>
-  <p class="form-status" id="join-status" role="status" aria-live="polite"></p>
+  <button type="submit" class="btn justify-self-start" id="join-submit">{t('join.submit')}</button>
+  <p
+    class="m-0 min-h-[1.2em] font-semibold data-[kind=error]:text-red-700 data-[kind=success]:text-gold-700"
+    id="join-status"
+    role="status"
+    aria-live="polite"
+  ></p>
 </form>
 
 <script type="application/json" id="join-strings" is:inline set:html={JSON.stringify(strings)} />
@@ -60,9 +64,7 @@ const strings = {
       status.textContent = cfg.sending;
       btn.disabled = true;
 
-      const fd = new FormData(form);
-      const payload = Object.fromEntries(fd.entries());
-
+      const payload = Object.fromEntries(new FormData(form).entries());
       try {
         const res = await fetch('/api/membership', {
           method: 'POST',

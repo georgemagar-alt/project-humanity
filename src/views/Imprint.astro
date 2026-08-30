@@ -7,8 +7,9 @@ interface Props {
 const { lang } = Astro.props;
 ---
 
-<article class="prose">
-  <h1>{lang === 'de' ? 'Impressum' : 'Imprint'}</h1>
+<div class="container-page py-16 lg:py-20">
+<article class="prose-page">
+  <h1 class="text-4xl sm:text-5xl font-bold mb-6">{lang === 'de' ? 'Impressum' : 'Imprint'}</h1>
 
   <p>
     <strong>{lang === 'de' ? 'Platzhalter – bitte ausfüllen und rechtlich prüfen.' : 'Placeholder – fill in and have it checked legally.'}</strong>
@@ -41,3 +42,4 @@ const { lang } = Astro.props;
       : 'Responsible for content under § 18 (2) MStV: First Last, address as above.'}
   </p>
 </article>
+</div>

@@ -8,8 +8,8 @@ interface Props {
 }
 const { lang, campaigns } = Astro.props;
 const t = useTranslations(lang);
+const de = lang === 'de';
 
-// Only campaigns that still accept donations.
 const open = campaigns.filter((c) => c.status === 'active');
 const presets = [10, 25, 50, 100];
 
@@ -19,30 +19,30 @@ const strings = {
   thanksTitle: t('donate.thanksTitle'),
   thanksBody: t('donate.thanksBody'),
   error: t('donate.error'),
-  invalidAmount:
-    lang === 'de'
-      ? 'Bitte einen Betrag zwischen 1 € und 5.000 € wählen.'
-      : 'Please choose an amount between €1 and €5,000.',
-  missingConfig:
-    lang === 'de'
-      ? 'Spenden per PayPal ist gerade nicht konfiguriert.'
-      : 'PayPal donations are not configured right now.',
+  invalidAmount: de
+    ? 'Bitte einen Betrag zwischen 1 € und 5.000 € wählen.'
+    : 'Please choose an amount between €1 and €5,000.',
+  missingConfig: de
+    ? 'Spenden per PayPal ist gerade nicht konfiguriert.'
+    : 'PayPal donations are not configured right now.',
 };
+
+const chip =
+  'rounded-full border-2 border-line bg-white px-5 py-2 font-semibold cursor-pointer hover:border-gold ' +
+  'aria-pressed:bg-gold aria-pressed:border-gold aria-pressed:text-ink';
 ---
 
 {
   open.length === 0 ? (
-    <p>
-      {lang === 'de'
-        ? 'Zurzeit läuft keine aktive Spendenkampagne.'
-        : 'There is no active donation campaign right now.'}
+    <p class="text-muted">
+      {de ? 'Zurzeit läuft keine aktive Spendenkampagne.' : 'There is no active donation campaign right now.'}
     </p>
   ) : (
-    <form class="stack" id="donate-form" novalidate>
+    <form class="grid gap-6 max-w-xl" id="donate-form" novalidate>
       {open.length > 1 && (
-        <label>
+        <label class="grid gap-1.5 font-semibold">
           {t('donate.selectCampaign')}
-          <select id="donate-campaign" name="campaign">
+          <select id="donate-campaign" name="campaign" class="field">
             {open.map((c) => (
               <option value={c.id}>{c.title[lang]}</option>
             ))}
@@ -51,32 +51,24 @@ const strings = {
       )}
       {open.length === 1 && <input type="hidden" id="donate-campaign" value={open[0].id} />}
 
-      <fieldset style="border:0;padding:0;margin:0">
-        <legend style="font-weight:600;margin-bottom:.4rem">{t('donate.chooseAmount')}</legend>
-        <div class="amount-options" id="donate-presets">
+      <fieldset class="border-0 p-0 m-0">
+        <legend class="font-semibold mb-2">{t('donate.chooseAmount')}</legend>
+        <div class="flex flex-wrap gap-2.5" id="donate-presets">
           {presets.map((p) => (
-            <button type="button" data-cents={p * 100} aria-pressed={p === 25 ? 'true' : 'false'}>
+            <button type="button" class={chip} data-cents={p * 100} aria-pressed={p === 25 ? 'true' : 'false'}>
               {p} €
             </button>
           ))}
         </div>
       </fieldset>
 
-      <label>
+      <label class="grid gap-1.5 font-semibold">
         {t('donate.customAmount')}
-        <input
-          type="number"
-          id="donate-custom"
-          inputmode="decimal"
-          min="1"
-          max="5000"
-          step="1"
-          placeholder="—"
-        />
+        <input type="number" id="donate-custom" class="field" inputmode="decimal" min="1" max="5000" step="1" placeholder="—" />
       </label>
 
       <button type="submit" class="btn" id="donate-start">{t('donate.button')}</button>
-      <p class="form-status" id="donate-status" role="status" aria-live="polite"></p>
+      <p class="m-0 min-h-[1.2em] font-semibold data-[kind=error]:text-red-700 data-[kind=success]:text-gold-700" id="donate-status" role="status" aria-live="polite"></p>
       <div id="paypal-buttons"></div>
     </form>
   )
@@ -105,7 +97,7 @@ const strings = {
     const status = document.getElementById('donate-status') as HTMLElement;
     const buttonsHost = document.getElementById('paypal-buttons') as HTMLElement;
 
-    let amountCents = 2500; // default = 25 € preset
+    let amountCents = 2500;
     let sdkPromise: Promise<void> | null = null;
     let buttonsRendered = false;
 
@@ -127,9 +119,7 @@ const strings = {
       }
     });
 
-    function currentCampaignId(): number {
-      return Number(campaignEl?.value || 0);
-    }
+    const currentCampaignId = () => Number(campaignEl?.value || 0);
 
     function setStatus(msg: string, kind: 'error' | 'success' | '') {
       status.textContent = msg;
@@ -140,7 +130,6 @@ const strings = {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       setStatus('', '');
-
       if (!PAYPAL_CLIENT_ID) {
         setStatus(cfg.missingConfig, 'error');
         return;
@@ -149,7 +138,6 @@ const strings = {
         setStatus(cfg.invalidAmount, 'error');
         return;
       }
-
       startBtn.disabled = true;
       setStatus(cfg.processing, '');
       try {
@@ -200,8 +188,7 @@ const strings = {
               }),
             });
             if (!res.ok) throw new Error('create-order failed');
-            const data = await res.json();
-            return data.id;
+            return (await res.json()).id;
           },
           onApprove: async (data: { orderID: string }) => {
             setStatus(cfg.processing, '');
@@ -215,9 +202,9 @@ const strings = {
               return;
             }
             buttonsHost.innerHTML = '';
-            form.querySelectorAll('fieldset, label, #donate-custom').forEach((el) =>
-              (el as HTMLElement).setAttribute('hidden', 'true'),
-            );
+            form
+              .querySelectorAll('fieldset, label, #donate-custom')
+              .forEach((el) => (el as HTMLElement).setAttribute('hidden', 'true'));
             setStatus(`${cfg.thanksTitle} ${cfg.thanksBody}`, 'success');
             window.dispatchEvent(new CustomEvent('campaign:refresh'));
           },

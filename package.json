@@ -14,7 +14,9 @@
   "dependencies": {
     "@astrojs/netlify": "^8.2.4",
     "@libsql/client": "^0.17.4",
+    "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.2.9",
+    "tailwindcss": "^4.3.3",
     "zod": "^4.5.2"
   },
   "devDependencies": {

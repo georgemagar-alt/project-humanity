@@ -9,16 +9,20 @@ interface Props {
 const { entry, lang } = Astro.props;
 const t = useTranslations(lang);
 const { Content } = await render(entry);
-const fmt = new Intl.DateTimeFormat(lang === 'de' ? 'de-DE' : 'en-GB', {
-  dateStyle: 'long',
-});
+const fmt = new Intl.DateTimeFormat(lang === 'de' ? 'de-DE' : 'en-GB', { dateStyle: 'long' });
 ---
 
-<article class="prose">
-  <p><a href={localizePath('/aktuelles', lang)}>← {t('nav.news')}</a></p>
-  <h1>{entry.data.title}</h1>
-  <p>
-    <time datetime={entry.data.date.toISOString()}>{fmt.format(entry.data.date)}</time>
-  </p>
-  <Content />
-</article>
+<div class="container-page py-16 lg:py-20">
+  <article class="prose-page">
+    <p class="mb-6">
+      <a href={localizePath('/aktuelles', lang)} class="font-semibold text-gold-700 hover:underline">
+        ← {t('nav.news')}
+      </a>
+    </p>
+    <time datetime={entry.data.date.toISOString()} class="text-sm font-semibold text-muted">
+      {fmt.format(entry.data.date)}
+    </time>
+    <h1 class="mt-1.5 text-4xl sm:text-5xl font-bold mb-6">{entry.data.title}</h1>
+    <Content />
+  </article>
+</div>

@@ -8,8 +8,9 @@ const { lang } = Astro.props;
 const de = lang === 'de';
 ---
 
-<article class="prose">
-  <h1>{de ? 'Datenschutzerklärung' : 'Privacy Policy'}</h1>
+<div class="container-page py-16 lg:py-20">
+<article class="prose-page">
+  <h1 class="text-4xl sm:text-5xl font-bold mb-6">{de ? 'Datenschutzerklärung' : 'Privacy Policy'}</h1>
 
   <p>
     <strong>{de ? 'Platzhalter – bitte an eure tatsächlichen Verhältnisse anpassen und rechtlich prüfen lassen.' : 'Placeholder – adapt to your actual setup and have it reviewed legally.'}</strong>
@@ -60,3 +61,4 @@ const de = lang === 'de';
       : 'This website sets no analytics or tracking cookies. Fonts are served locally.'}
   </p>
 </article>
+</div>

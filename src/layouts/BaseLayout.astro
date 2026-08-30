@@ -13,6 +13,7 @@ interface Props {
 const { title, description, lang } = Astro.props;
 const t = useTranslations(lang);
 const fullTitle = `${title} – ${t('site.name')}`;
+
 const origin = Astro.site ?? new URL(Astro.url.origin);
 const canonical = new URL(Astro.url.pathname, origin).toString();
 const altDe = new URL(swapLangPath(Astro.url.pathname, 'de'), origin).toString();
@@ -24,7 +25,7 @@ const orgLd = {
   name: 'Project Humanity e.V.',
   alternateName: 'Project Humanity',
   url: origin.toString(),
-  logo: new URL('/favicon.svg', origin).toString(),
+  logo: new URL('/logo.svg', origin).toString(),
   description:
     lang === 'de'
       ? 'Gemeinnütziger Verein, der den ärmsten Menschen in den Slums Afrikas Nahrung, Kleidung, Schulmaterial und medizinische Versorgung bereitstellt.'
@@ -37,9 +38,9 @@ const orgLd = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#123d2b" />
-    <Font cssVariable="--font-sans" preload />
-    <Font cssVariable="--font-display" preload />
+    <meta name="theme-color" content="#f9ae1b" />
+    <Font cssVariable="--ff-sans" preload />
+    <Font cssVariable="--ff-display" preload />
     <title>{fullTitle}</title>
     {description && <meta name="description" content={description} />}
     <link rel="canonical" href={canonical} />
@@ -53,10 +54,10 @@ const orgLd = {
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <script type="application/ld+json" is:inline set:html={JSON.stringify(orgLd)} />
   </head>
-  <body>
+  <body class="min-h-screen flex flex-col">
     <a class="skip-link" href="#main">{lang === 'de' ? 'Zum Inhalt springen' : 'Skip to content'}</a>
     <Nav lang={lang} />
-    <main id="main" class="container">
+    <main id="main" class="flex-1">
       <slot />
     </main>
     <Footer lang={lang} />

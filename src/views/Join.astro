@@ -7,22 +7,26 @@ interface Props {
 }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
+const de = lang === 'de';
 ---
 
-<section>
-  <h1>{t('nav.join')}</h1>
-  <p class="lede">
-    {lang === 'de'
-      ? 'Mitglieder tragen den Verein – mit Beitrag, Zeit oder beidem. Schick uns eine kurze Anfrage, wir melden uns.'
-      : 'Members carry the association — with dues, time, or both. Send us a short request and we will get back to you.'}
-  </p>
-</section>
+<div class="container-page py-16 lg:py-20">
+  <div class="max-w-2xl">
+    <p class="eyebrow">{de ? 'Mitmachen' : 'Get involved'}</p>
+    <h1 class="text-4xl sm:text-5xl font-bold">{t('nav.join')}</h1>
+    <p class="mt-4 text-lg text-muted">
+      {de
+        ? 'Mitglieder tragen den Verein – mit Beitrag, Zeit oder beidem. Schick uns eine kurze Anfrage, wir melden uns.'
+        : 'Members carry the association — with dues, time, or both. Send us a short request and we will get back to you.'}
+    </p>
+  </div>
 
-<section>
-  <MembershipForm lang={lang} />
-  <p class="bar__needed" style="margin-top:1rem">
-    {lang === 'de'
-      ? 'Deine Angaben nutzen wir nur zur Bearbeitung deiner Anfrage. Details in der Datenschutzerklärung.'
-      : 'We use your details only to process your request. See the privacy policy for details.'}
-  </p>
-</section>
+  <div class="mt-10">
+    <MembershipForm lang={lang} />
+    <p class="mt-6 text-sm text-muted max-w-xl">
+      {de
+        ? 'Deine Angaben nutzen wir nur zur Bearbeitung deiner Anfrage. Details in der Datenschutzerklärung.'
+        : 'We use your details only to process your request. See the privacy policy for details.'}
+    </p>
+  </div>
+</div>

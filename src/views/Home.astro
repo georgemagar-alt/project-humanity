@@ -9,6 +9,7 @@ interface Props {
 }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
+const de = lang === 'de';
 
 let campaigns: CampaignPublic[] = [];
 try {
@@ -16,63 +17,128 @@ try {
 } catch {
   campaigns = [];
 }
-
 const active = campaigns.filter((c) => c.status === 'active');
-const totalRaised = active.reduce((sum, c) => sum + c.raisedCents, 0);
-const totalDonors = active.reduce((sum, c) => sum + c.donorCount, 0);
+const totalRaised = active.reduce((s, c) => s + c.raisedCents, 0);
+
+const stats = [
+  { value: '33,7 Mio.', label: de ? 'Menschen im Sudan brauchen 2026 Hilfe' : 'people in Sudan need aid in 2026' },
+  { value: de ? '1 von 4' : '1 in 4', label: de ? 'Menschen im Sudan ist auf der Flucht' : 'people in Sudan is displaced' },
+  { value: '100 %', label: de ? 'jeder Spende fließt in die Projekte' : 'of every donation goes to the projects' },
+];
 ---
 
-<section class="hero">
-  <p class="eyebrow">{t('site.name')}</p>
-  <h1>
-    {lang === 'de'
-      ? 'Konkrete Hilfe für die Ärmsten in den Slums Afrikas.'
-      : 'Concrete help for the poorest people in the slums of Africa.'}
-  </h1>
-  <p class="lede">
-    {lang === 'de'
-      ? 'Project Humanity e.V. bringt Nahrung, Kleidung, Schulmaterial und medizinische Versorgung dorthin, wo sie am dringendsten gebraucht werden – unabhängig von Religion oder Herkunft. Als gemeinnütziger Verein sorgen wir dafür, dass jede Spende unmittelbar ankommt.'
-      : 'Project Humanity e.V. brings food, clothing, school supplies and healthcare to where they are needed most — regardless of religion or origin. As a non-profit, we make sure every donation arrives directly.'}
-  </p>
-  <div class="actions">
-    <a class="btn" href={localizePath('/spenden', lang)}>{t('nav.donate')}</a>
-    <a class="btn btn--ghost btn--on-dark" href={localizePath('/mitglied-werden', lang)}>
-      {t('nav.join')}
-    </a>
+<!-- Hero -->
+<section class="relative isolate overflow-clip bg-ink text-white">
+  <img
+    src="/images/hero.jpg"
+    alt=""
+    onerror="this.remove()"
+    class="absolute inset-0 -z-20 h-full w-full object-cover object-center opacity-70"
+    loading="eager"
+  />
+  <div
+    class="absolute inset-0 -z-10"
+    style="background:radial-gradient(120% 100% at 15% 0%, rgba(249,174,27,.16), transparent 55%), linear-gradient(to top, #17150f, rgba(23,21,15,.6))"
+  >
   </div>
-  {
-    active.length > 0 && (
-      <p class="hero-stat">
-        <strong>{formatCents(totalRaised, lang)}</strong>{' '}
-        {lang === 'de'
-          ? `von ${active.length} ${active.length === 1 ? 'aktiver Kampagne' : 'aktiven Kampagnen'} gesammelt`
-          : `raised across ${active.length} active ${active.length === 1 ? 'campaign' : 'campaigns'}`}
-        {totalDonors > 0 &&
-          (lang === 'de'
-            ? ` · ${totalDonors} Unterstützer:innen`
-            : ` · ${totalDonors} supporters`)}
+  <div class="container-page py-24 sm:py-28 lg:py-36 max-w-3xl">
+    <p class="eyebrow text-gold">{t('site.name')}</p>
+    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white">
+      {de
+        ? 'Konkrete Hilfe für die Ärmsten in den Slums Afrikas.'
+        : 'Concrete help for the poorest people in the slums of Africa.'}
+    </h1>
+    <p class="mt-6 text-lg sm:text-xl text-white/85 max-w-2xl">
+      {de
+        ? 'Project Humanity e.V. bringt Nahrung, Kleidung, Schulmaterial und medizinische Versorgung dorthin, wo sie am dringendsten gebraucht werden – unabhängig von Religion oder Herkunft.'
+        : 'Project Humanity e.V. brings food, clothing, school supplies and healthcare to where they are needed most — regardless of religion or origin.'}
+    </p>
+    <div class="mt-9 flex flex-wrap gap-3">
+      <a class="btn" href={localizePath('/spenden', lang)}>{t('nav.donate')}</a>
+      <a class="btn btn-on-dark" href={localizePath('/mitglied-werden', lang)}>{t('nav.join')}</a>
+    </div>
+  </div>
+</section>
+
+<!-- Stat band -->
+<section class="bg-gold text-ink">
+  <div class="container-page py-12 grid gap-8 sm:grid-cols-3 text-center sm:text-left">
+    {stats.map((s) => (
+      <div>
+        <div class="font-display text-4xl sm:text-5xl font-bold leading-none">{s.value}</div>
+        <p class="mt-2 text-sm font-medium text-ink/80">{s.label}</p>
+      </div>
+    ))}
+  </div>
+</section>
+
+<!-- Campaigns -->
+<section class="container-page py-20 lg:py-24">
+  <p class="eyebrow">{de ? 'Jede Spende zählt' : 'Every donation counts'}</p>
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <h2 class="text-3xl sm:text-4xl font-bold">{de ? 'Aktuelle Kampagnen' : 'Current campaigns'}</h2>
+    {active.length > 0 && (
+      <p class="text-muted">
+        <span class="font-display text-xl font-bold text-ink">{formatCents(totalRaised, lang)}</span>{' '}
+        {de ? 'bisher gesammelt' : 'raised so far'}
       </p>
-    )
-  }
+    )}
+  </div>
+  <div class="mt-8">
+    <CampaignList lang={lang} campaigns={campaigns} />
+  </div>
 </section>
 
-<section aria-labelledby="campaigns-h">
-  <p class="eyebrow">{lang === 'de' ? 'Jede Spende zählt' : 'Every donation counts'}</p>
-  <h2 id="campaigns-h">{lang === 'de' ? 'Aktuelle Kampagnen' : 'Current campaigns'}</h2>
-  <CampaignList lang={lang} campaigns={campaigns} />
+<!-- Approach split -->
+<section class="bg-sand">
+  <div class="container-page py-20 lg:py-24 grid gap-10 lg:grid-cols-2 lg:items-center">
+    <div class="relative overflow-clip rounded-[10px] bg-ink text-white aspect-[4/3] flex items-center">
+      <img
+        src="/images/approach.jpg"
+        alt=""
+        onerror="this.remove()"
+        class="absolute inset-0 h-full w-full object-cover opacity-75"
+        loading="lazy"
+      />
+      <blockquote class="relative container-page">
+        <p class="font-display text-2xl sm:text-3xl font-bold leading-tight">
+          {de
+            ? '„Nur weil ein Mensch an einem bestimmten Ort geboren wurde, sollte er nicht an Hunger sterben."'
+            : '“No one should die of hunger simply because of where they were born.”'}
+        </p>
+      </blockquote>
+    </div>
+    <div>
+      <p class="eyebrow">{de ? 'Unser Ansatz' : 'Our approach'}</p>
+      <h2 class="text-3xl sm:text-4xl font-bold">{de ? 'So arbeiten wir' : 'How we work'}</h2>
+      <p class="mt-4 text-lg text-muted">
+        {de
+          ? 'Christlich motiviert, ehrenamtlich getragen und projektbezogen – mit offener Abrechnung. Als gemeinnütziger Verein stellen wir sicher, dass jede Spende unmittelbar ankommt.'
+          : 'Christian-motivated, volunteer-run and project-based — with open accounting. As a non-profit, we make sure every donation arrives directly.'}
+      </p>
+      <p class="mt-6">
+        <a href={localizePath('/was-wir-tun', lang)} class="font-semibold underline decoration-gold underline-offset-4 hover:text-gold-700">
+          {de ? 'Warum wir uns auf Afrika und den Sudan konzentrieren' : 'Why we focus on Africa and Sudan'} →
+        </a>
+      </p>
+    </div>
+  </div>
 </section>
 
-<section>
-  <p class="eyebrow">{lang === 'de' ? 'Unser Ansatz' : 'Our approach'}</p>
-  <h2>{lang === 'de' ? 'So arbeiten wir' : 'How we work'}</h2>
-  <p class="lede">
-    {lang === 'de'
-      ? 'Christlich motiviert, ehrenamtlich getragen und projektbezogen – mit offener Abrechnung.'
-      : 'Christian-motivated, volunteer-run and project-based — with open accounting.'}
-  </p>
-  <p>
-    <a href={localizePath('/was-wir-tun', lang)}>
-      {lang === 'de' ? 'Warum wir uns auf Afrika und den Sudan konzentrieren' : 'Why we focus on Africa and Sudan'} →
-    </a>
-  </p>
+<!-- Closing CTA -->
+<section class="bg-ink text-white">
+  <div class="container-page py-20 text-center">
+    <h2 class="text-3xl sm:text-4xl font-bold text-white">
+      {de ? 'Werde Teil davon.' : 'Be part of it.'}
+    </h2>
+    <p class="mt-3 text-white/75 max-w-xl mx-auto">
+      {de
+        ? 'Mit deiner Spende oder deiner Mitgliedschaft.'
+        : 'With your donation or your membership.'}
+    </p>
+    <div class="mt-8 flex flex-wrap gap-3 justify-center">
+      <a class="btn" href={localizePath('/spenden', lang)}>{t('nav.donate')}</a>
+      <a class="btn btn-on-dark" href={localizePath('/mitglied-werden', lang)}>{t('nav.join')}</a>
+    </div>
+  </div>
 </section>

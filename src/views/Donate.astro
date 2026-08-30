@@ -9,6 +9,7 @@ interface Props {
 }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
+const de = lang === 'de';
 
 let campaigns: CampaignPublic[] = [];
 try {
@@ -18,27 +19,33 @@ try {
 }
 ---
 
-<section>
-  <p class="eyebrow">{lang === 'de' ? '100 % kommt an' : '100% arrives'}</p>
-  <h1>{t('donate.heading')}</h1>
-  <p class="lede">
-    {lang === 'de'
-      ? 'Wähle eine Kampagne und einen Betrag. Die Zahlung läuft über PayPal; der Spendenstand aktualisiert sich sofort.'
-      : 'Pick a campaign and an amount. Payment is handled by PayPal; the total updates immediately.'}
-  </p>
-</section>
+<div class="container-page py-16 lg:py-20">
+  <div class="max-w-2xl">
+    <p class="eyebrow">{de ? '100 % kommt an' : '100% arrives'}</p>
+    <h1 class="text-4xl sm:text-5xl font-bold">{t('donate.heading')}</h1>
+    <p class="mt-4 text-lg text-muted">
+      {de
+        ? 'Wähle eine Kampagne und einen Betrag. Die Zahlung läuft über PayPal; der Spendenstand aktualisiert sich sofort.'
+        : 'Pick a campaign and an amount. Payment is handled by PayPal; the total updates immediately.'}
+    </p>
+  </div>
 
-<section aria-labelledby="state-h">
-  <h2 id="state-h">{lang === 'de' ? 'Aktueller Stand' : 'Current status'}</h2>
-  <CampaignList lang={lang} campaigns={campaigns} showDonateLink={false} />
-</section>
+  <section class="mt-12" aria-labelledby="state-h">
+    <h2 id="state-h" class="text-2xl font-bold">{de ? 'Aktueller Stand' : 'Current status'}</h2>
+    <div class="mt-6">
+      <CampaignList lang={lang} campaigns={campaigns} showDonateLink={false} />
+    </div>
+  </section>
 
-<section aria-labelledby="form-h">
-  <h2 id="form-h">{lang === 'de' ? 'Spende abschließen' : 'Complete your donation'}</h2>
-  <DonateWidget lang={lang} campaigns={campaigns} />
-  <p class="bar__needed" style="margin-top:1.25rem">
-    {lang === 'de'
-      ? 'Hinweis: Die Bestätigungs-E-Mail ist keine Zuwendungsbestätigung im steuerlichen Sinne.'
-      : 'Note: the confirmation email is not an official tax donation receipt.'}
-  </p>
-</section>
+  <section class="mt-14 max-w-xl" aria-labelledby="form-h">
+    <h2 id="form-h" class="text-2xl font-bold">{de ? 'Spende abschließen' : 'Complete your donation'}</h2>
+    <div class="mt-6">
+      <DonateWidget lang={lang} campaigns={campaigns} />
+    </div>
+    <p class="mt-6 text-sm text-muted">
+      {de
+        ? 'Hinweis: Die Bestätigungs-E-Mail ist keine Zuwendungsbestätigung im steuerlichen Sinne.'
+        : 'Note: the confirmation email is not an official tax donation receipt.'}
+    </p>
+  </section>
+</div>

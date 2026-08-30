@@ -4,6 +4,7 @@ const lang = 'de' as const;
 ---
 
 <Base lang={lang} title="Admin – Kampagnen">
+  <div class="container-page py-16">
   <section id="admin-login">
     <h1>Admin</h1>
     <form class="stack" id="login-form">
@@ -18,7 +19,7 @@ const lang = 'de' as const;
 
   <section id="admin-app" hidden>
     <h1>Kampagnen verwalten</h1>
-    <p><button class="btn btn--ghost" id="logout">Abmelden</button></p>
+    <p><button class="btn btn-outline" id="logout">Abmelden</button></p>
 
     <div id="campaigns"></div>
 
@@ -46,6 +47,7 @@ const lang = 'de' as const;
     <h2>Letzte Spenden</h2>
     <div id="donations"></div>
   </section>
+  </div>
 </Base>
 
 <script>
@@ -120,9 +122,9 @@ const lang = 'de' as const;
     campaignsEl.innerHTML = list
       .map(
         (c) => `
-      <form class="stack" data-form="update" data-id="${c.id}" style="border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1rem">
+      <form class="stack" data-form="update" data-id="${c.id}" style="border:1px solid var(--color-line);border-radius:10px;padding:1rem;margin-bottom:1rem">
         <strong>#${c.id} · ${esc(c.slug)}</strong>
-        <span class="bar__needed">${euro.format(c.raisedCents / 100)} / ${euro.format(c.goalCents / 100)} · ${c.donorCount} Spenden</span>
+        <span class="text-sm text-muted">${euro.format(c.raisedCents / 100)} / ${euro.format(c.goalCents / 100)} · ${c.donorCount} Spenden</span>
         <label>Titel (DE)<input name="title_de" value="${esc(c.title.de)}" required></label>
         <label>Titel (EN)<input name="title_en" value="${esc(c.title.en)}" required></label>
         <label>Beschreibung (DE)<textarea name="description_de">${esc(c.description.de)}</textarea></label>
@@ -153,7 +155,7 @@ const lang = 'de' as const;
         (d) => `<li><article>
           <time>${esc(d.created_at)}</time>
           <div><strong>${euro.format(Number(d.gross_cents) / 100)}</strong> · ${esc(d.campaign_title)} · ${esc(d.status)}</div>
-          <div class="bar__needed">${esc(d.donor_name || '—')} · ${esc(d.donor_email || '—')}</div>
+          <div class="text-sm text-muted">${esc(d.donor_name || '—')} · ${esc(d.donor_email || '—')}</div>
         </article></li>`,
       )
       .join('')}</ul>`;

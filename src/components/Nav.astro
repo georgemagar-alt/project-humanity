@@ -14,62 +14,76 @@ const items: { key: Parameters<typeof t>[0]; path: string }[] = [
   { key: 'nav.work', path: '/was-wir-tun' },
   { key: 'nav.news', path: '/aktuelles' },
   { key: 'nav.events', path: '/termine' },
-  { key: 'nav.donate', path: '/spenden' },
-  { key: 'nav.join', path: '/mitglied-werden' },
   { key: 'nav.contact', path: '/kontakt' },
 ];
 
-function isCurrent(path: string): boolean {
+const isCurrent = (path: string) => {
   const target = localizePath(path, lang).replace(/\/$/, '') || '/';
   return here === target || here.startsWith(target + '/');
-}
+};
 ---
 
-<header class="site-header" id="site-header">
-  <div class="container">
-    <a class="brand" href={localizePath('/', lang)}>Project Humanity</a>
+<header
+  id="site-header"
+  class="sticky top-0 z-50 bg-paper/95 backdrop-blur border-b border-line"
+>
+  <div class="container-page flex items-center gap-4 py-3">
+    <a href={localizePath('/', lang)} class="flex items-center gap-2.5 shrink-0" aria-label="Project Humanity">
+      <img src="/logo.svg" alt="" width="36" height="36" class="h-9 w-9 rounded-md object-contain bg-gold" />
+      <span class="font-display text-lg font-bold tracking-tight leading-none">
+        Project&nbsp;Humanity
+      </span>
+    </a>
 
     <button
-      class="nav-toggle"
       type="button"
+      class="nav-toggle ml-auto lg:hidden inline-flex items-center gap-2 rounded-md border border-line px-3 py-2 font-semibold"
       aria-expanded="false"
       aria-controls="primary-nav"
     >
-      <span aria-hidden="true">☰</span>
-      {lang === 'de' ? 'Menü' : 'Menu'}
+      <span aria-hidden="true">☰</span>{lang === 'de' ? 'Menü' : 'Menu'}
     </button>
 
-    <nav class="site-nav" id="primary-nav" aria-label={lang === 'de' ? 'Hauptnavigation' : 'Main navigation'}>
-      <ul>
+    <nav
+      id="primary-nav"
+      aria-label={lang === 'de' ? 'Hauptnavigation' : 'Main navigation'}
+      class="site-nav hidden lg:flex lg:items-center lg:gap-1 lg:ml-auto w-full lg:w-auto order-last lg:order-none"
+    >
+      <ul class="flex flex-col lg:flex-row lg:items-center gap-0.5 lg:gap-1 py-2 lg:py-0 w-full">
         {items.map((item) => (
           <li>
             <a
               href={localizePath(item.path, lang)}
               aria-current={isCurrent(item.path) ? 'page' : undefined}
+              class="block rounded-md px-3 py-2.5 lg:py-2 font-medium hover:bg-sand aria-[current=page]:font-bold aria-[current=page]:text-gold-700"
             >
               {t(item.key)}
             </a>
           </li>
         ))}
       </ul>
+      <div class="flex items-center gap-3 py-2 lg:py-0 lg:ml-2">
+        <LanguageSwitcher lang={lang} />
+        <a href={localizePath('/spenden', lang)} class="btn px-5 py-2.5">{t('nav.donate')}</a>
+      </div>
     </nav>
-
-    <LanguageSwitcher lang={lang} />
   </div>
 </header>
 
 <script>
   const header = document.getElementById('site-header');
+  const nav = document.getElementById('primary-nav');
   const toggle = header?.querySelector<HTMLButtonElement>('.nav-toggle');
   toggle?.addEventListener('click', () => {
-    const open = header!.classList.toggle('open');
+    const open = nav?.classList.toggle('hidden') === false;
     toggle.setAttribute('aria-expanded', String(open));
   });
-  // Collapse the mobile menu after following a link.
-  header?.querySelectorAll('.site-nav a').forEach((a) =>
+  nav?.querySelectorAll('a').forEach((a) =>
     a.addEventListener('click', () => {
-      header.classList.remove('open');
-      toggle?.setAttribute('aria-expanded', 'false');
+      if (window.innerWidth < 1024) {
+        nav.classList.add('hidden');
+        toggle?.setAttribute('aria-expanded', 'false');
+      }
     }),
   );
 </script>

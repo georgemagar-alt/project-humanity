@@ -6,10 +6,11 @@ interface Props {
 }
 const { lang } = Astro.props;
 const path = Astro.url.pathname;
+const base = 'px-1.5 py-0.5 rounded text-sm font-semibold text-muted aria-[current=true]:text-ink aria-[current=true]:bg-sand';
 ---
 
-<div class="lang-switch" aria-label="Sprache / Language">
-  <a href={swapLangPath(path, 'de')} hreflang="de" aria-current={lang === 'de' ? 'true' : 'false'}>DE</a>
-  <span aria-hidden="true">·</span>
-  <a href={swapLangPath(path, 'en')} hreflang="en" aria-current={lang === 'en' ? 'true' : 'false'}>EN</a>
+<div class="flex items-center gap-0.5" aria-label="Sprache / Language">
+  <a href={swapLangPath(path, 'de')} hreflang="de" aria-current={lang === 'de' ? 'true' : 'false'} class={base}>DE</a>
+  <span aria-hidden="true" class="text-line">/</span>
+  <a href={swapLangPath(path, 'en')} hreflang="en" aria-current={lang === 'en' ? 'true' : 'false'} class={base}>EN</a>
 </div>
