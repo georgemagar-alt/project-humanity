@@ -1,0 +1,9 @@
+---
+import Base from '../../layouts/BaseLayout.astro';
+import NewsIndex from '../../views/NewsIndex.astro';
+const lang = 'de' as const;
+---
+
+<Base lang={lang} title="Aktuelles" description="Neuigkeiten aus dem Verein.">
+  <NewsIndex lang={lang} />
+</Base>

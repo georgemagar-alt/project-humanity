@@ -1,0 +1,24 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import { useTranslations, localizePath, type Lang } from '../i18n/ui';
+
+interface Props {
+  entry: CollectionEntry<'news'>;
+  lang: Lang;
+}
+const { entry, lang } = Astro.props;
+const t = useTranslations(lang);
+const { Content } = await render(entry);
+const fmt = new Intl.DateTimeFormat(lang === 'de' ? 'de-DE' : 'en-GB', {
+  dateStyle: 'long',
+});
+---
+
+<article class="prose">
+  <p><a href={localizePath('/aktuelles', lang)}>← {t('nav.news')}</a></p>
+  <h1>{entry.data.title}</h1>
+  <p>
+    <time datetime={entry.data.date.toISOString()}>{fmt.format(entry.data.date)}</time>
+  </p>
+  <Content />
+</article>

@@ -1,0 +1,64 @@
+---
+import '../styles/global.css';
+import { Font } from 'astro:assets';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { useTranslations, swapLangPath, type Lang } from '../i18n/ui';
+
+interface Props {
+  title: string;
+  description?: string;
+  lang: Lang;
+}
+const { title, description, lang } = Astro.props;
+const t = useTranslations(lang);
+const fullTitle = `${title} – ${t('site.name')}`;
+const origin = Astro.site ?? new URL(Astro.url.origin);
+const canonical = new URL(Astro.url.pathname, origin).toString();
+const altDe = new URL(swapLangPath(Astro.url.pathname, 'de'), origin).toString();
+const altEn = new URL(swapLangPath(Astro.url.pathname, 'en'), origin).toString();
+
+const orgLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NGO',
+  name: 'Project Humanity e.V.',
+  alternateName: 'Project Humanity',
+  url: origin.toString(),
+  logo: new URL('/favicon.svg', origin).toString(),
+  description:
+    lang === 'de'
+      ? 'Gemeinnütziger Verein, der den ärmsten Menschen in den Slums Afrikas Nahrung, Kleidung, Schulmaterial und medizinische Versorgung bereitstellt.'
+      : 'Non-profit association providing food, clothing, school supplies and healthcare to the poorest people in the slums of Africa.',
+};
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#123d2b" />
+    <Font cssVariable="--font-sans" preload />
+    <Font cssVariable="--font-display" preload />
+    <title>{fullTitle}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="de" href={altDe} />
+    <link rel="alternate" hreflang="en" href={altEn} />
+    <link rel="alternate" hreflang="x-default" href={altDe} />
+    <meta property="og:title" content={fullTitle} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={lang === 'de' ? 'de_DE' : 'en_GB'} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(orgLd)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{lang === 'de' ? 'Zum Inhalt springen' : 'Skip to content'}</a>
+    <Nav lang={lang} />
+    <main id="main" class="container">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+  </body>
+</html>

@@ -1,0 +1,23 @@
+---
+import { useTranslations, localizePath, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <nav aria-label={lang === 'de' ? 'Rechtliches' : 'Legal'}>
+      <a href={localizePath('/impressum', lang)}>{t('nav.imprint')}</a>
+      &nbsp;·&nbsp;
+      <a href={localizePath('/datenschutz', lang)}>{t('nav.privacy')}</a>
+      &nbsp;·&nbsp;
+      <a href={localizePath('/kontakt', lang)}>{t('nav.contact')}</a>
+    </nav>
+    <p>© {year} {t('site.name')}. {t('footer.rights')}</p>
+  </div>
+</footer>

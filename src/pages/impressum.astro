@@ -1,0 +1,9 @@
+---
+import Base from '../layouts/BaseLayout.astro';
+import Imprint from '../views/Imprint.astro';
+const lang = 'de' as const;
+---
+
+<Base lang={lang} title="Impressum">
+  <Imprint lang={lang} />
+</Base>

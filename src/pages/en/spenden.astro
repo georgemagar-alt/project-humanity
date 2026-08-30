@@ -1,0 +1,13 @@
+---
+import Base from '../../layouts/BaseLayout.astro';
+import Donate from '../../views/Donate.astro';
+const lang = 'en' as const;
+---
+
+<Base
+  lang={lang}
+  title="Donate"
+  description="Donate to a concrete campaign via PayPal – with a total that updates immediately."
+>
+  <Donate lang={lang} />
+</Base>

@@ -1,0 +1,44 @@
+---
+import { useTranslations, type Lang } from '../i18n/ui';
+import { getPublicCampaigns, type CampaignPublic } from '../lib/db';
+import CampaignList from '../components/CampaignList.astro';
+import DonateWidget from '../components/DonateWidget.astro';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+let campaigns: CampaignPublic[] = [];
+try {
+  campaigns = await getPublicCampaigns();
+} catch {
+  campaigns = [];
+}
+---
+
+<section>
+  <p class="eyebrow">{lang === 'de' ? '100 % kommt an' : '100% arrives'}</p>
+  <h1>{t('donate.heading')}</h1>
+  <p class="lede">
+    {lang === 'de'
+      ? 'Wähle eine Kampagne und einen Betrag. Die Zahlung läuft über PayPal; der Spendenstand aktualisiert sich sofort.'
+      : 'Pick a campaign and an amount. Payment is handled by PayPal; the total updates immediately.'}
+  </p>
+</section>
+
+<section aria-labelledby="state-h">
+  <h2 id="state-h">{lang === 'de' ? 'Aktueller Stand' : 'Current status'}</h2>
+  <CampaignList lang={lang} campaigns={campaigns} showDonateLink={false} />
+</section>
+
+<section aria-labelledby="form-h">
+  <h2 id="form-h">{lang === 'de' ? 'Spende abschließen' : 'Complete your donation'}</h2>
+  <DonateWidget lang={lang} campaigns={campaigns} />
+  <p class="bar__needed" style="margin-top:1.25rem">
+    {lang === 'de'
+      ? 'Hinweis: Die Bestätigungs-E-Mail ist keine Zuwendungsbestätigung im steuerlichen Sinne.'
+      : 'Note: the confirmation email is not an official tax donation receipt.'}
+  </p>
+</section>

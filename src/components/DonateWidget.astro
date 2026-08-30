@@ -1,0 +1,234 @@
+---
+import { useTranslations, type Lang } from '../i18n/ui';
+import type { CampaignPublic } from '../lib/db';
+
+interface Props {
+  lang: Lang;
+  campaigns: CampaignPublic[];
+}
+const { lang, campaigns } = Astro.props;
+const t = useTranslations(lang);
+
+// Only campaigns that still accept donations.
+const open = campaigns.filter((c) => c.status === 'active');
+const presets = [10, 25, 50, 100];
+
+const strings = {
+  locale: lang,
+  processing: t('donate.processing'),
+  thanksTitle: t('donate.thanksTitle'),
+  thanksBody: t('donate.thanksBody'),
+  error: t('donate.error'),
+  invalidAmount:
+    lang === 'de'
+      ? 'Bitte einen Betrag zwischen 1 € und 5.000 € wählen.'
+      : 'Please choose an amount between €1 and €5,000.',
+  missingConfig:
+    lang === 'de'
+      ? 'Spenden per PayPal ist gerade nicht konfiguriert.'
+      : 'PayPal donations are not configured right now.',
+};
+---
+
+{
+  open.length === 0 ? (
+    <p>
+      {lang === 'de'
+        ? 'Zurzeit läuft keine aktive Spendenkampagne.'
+        : 'There is no active donation campaign right now.'}
+    </p>
+  ) : (
+    <form class="stack" id="donate-form" novalidate>
+      {open.length > 1 && (
+        <label>
+          {t('donate.selectCampaign')}
+          <select id="donate-campaign" name="campaign">
+            {open.map((c) => (
+              <option value={c.id}>{c.title[lang]}</option>
+            ))}
+          </select>
+        </label>
+      )}
+      {open.length === 1 && <input type="hidden" id="donate-campaign" value={open[0].id} />}
+
+      <fieldset style="border:0;padding:0;margin:0">
+        <legend style="font-weight:600;margin-bottom:.4rem">{t('donate.chooseAmount')}</legend>
+        <div class="amount-options" id="donate-presets">
+          {presets.map((p) => (
+            <button type="button" data-cents={p * 100} aria-pressed={p === 25 ? 'true' : 'false'}>
+              {p} €
+            </button>
+          ))}
+        </div>
+      </fieldset>
+
+      <label>
+        {t('donate.customAmount')}
+        <input
+          type="number"
+          id="donate-custom"
+          inputmode="decimal"
+          min="1"
+          max="5000"
+          step="1"
+          placeholder="—"
+        />
+      </label>
+
+      <button type="submit" class="btn" id="donate-start">{t('donate.button')}</button>
+      <p class="form-status" id="donate-status" role="status" aria-live="polite"></p>
+      <div id="paypal-buttons"></div>
+    </form>
+  )
+}
+
+<script type="application/json" id="donate-strings" is:inline set:html={JSON.stringify(strings)} />
+
+<script>
+  const PAYPAL_CLIENT_ID = import.meta.env.PUBLIC_PAYPAL_CLIENT_ID as string | undefined;
+
+  const form = document.getElementById('donate-form') as HTMLFormElement | null;
+  if (form) init(form);
+
+  function init(form: HTMLFormElement) {
+    const cfg = JSON.parse(
+      document.getElementById('donate-strings')?.textContent || '{}',
+    ) as Record<string, string>;
+
+    const presetsWrap = document.getElementById('donate-presets');
+    const custom = document.getElementById('donate-custom') as HTMLInputElement | null;
+    const campaignEl = document.getElementById('donate-campaign') as
+      | HTMLSelectElement
+      | HTMLInputElement
+      | null;
+    const startBtn = document.getElementById('donate-start') as HTMLButtonElement;
+    const status = document.getElementById('donate-status') as HTMLElement;
+    const buttonsHost = document.getElementById('paypal-buttons') as HTMLElement;
+
+    let amountCents = 2500; // default = 25 € preset
+    let sdkPromise: Promise<void> | null = null;
+    let buttonsRendered = false;
+
+    presetsWrap?.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest('button[data-cents]') as HTMLButtonElement | null;
+      if (!btn) return;
+      amountCents = Number(btn.dataset.cents);
+      if (custom) custom.value = '';
+      presetsWrap
+        .querySelectorAll('button')
+        .forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+    });
+
+    custom?.addEventListener('input', () => {
+      const euros = Number(custom.value.replace(',', '.'));
+      if (Number.isFinite(euros) && euros > 0) {
+        amountCents = Math.round(euros * 100);
+        presetsWrap?.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      }
+    });
+
+    function currentCampaignId(): number {
+      return Number(campaignEl?.value || 0);
+    }
+
+    function setStatus(msg: string, kind: 'error' | 'success' | '') {
+      status.textContent = msg;
+      if (kind) status.dataset.kind = kind;
+      else status.removeAttribute('data-kind');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      setStatus('', '');
+
+      if (!PAYPAL_CLIENT_ID) {
+        setStatus(cfg.missingConfig, 'error');
+        return;
+      }
+      if (!(amountCents >= 100 && amountCents <= 500000)) {
+        setStatus(cfg.invalidAmount, 'error');
+        return;
+      }
+
+      startBtn.disabled = true;
+      setStatus(cfg.processing, '');
+      try {
+        await loadSdk();
+        renderButtons();
+        startBtn.hidden = true;
+        setStatus('', '');
+      } catch {
+        setStatus(cfg.error, 'error');
+        startBtn.disabled = false;
+      }
+    });
+
+    function loadSdk(): Promise<void> {
+      if (sdkPromise) return sdkPromise;
+      sdkPromise = new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        const params = new URLSearchParams({
+          'client-id': PAYPAL_CLIENT_ID!,
+          currency: 'EUR',
+          intent: 'capture',
+          components: 'buttons',
+          'disable-funding': 'paylater,credit',
+        });
+        s.src = `https://www.paypal.com/sdk/js?${params.toString()}`;
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error('sdk load failed'));
+        document.head.appendChild(s);
+      });
+      return sdkPromise;
+    }
+
+    function renderButtons() {
+      const paypal = (window as any).paypal;
+      if (!paypal || buttonsRendered) return;
+      buttonsRendered = true;
+      paypal
+        .Buttons({
+          style: { layout: 'vertical', label: 'donate' },
+          createOrder: async () => {
+            const res = await fetch('/api/paypal/create-order', {
+              method: 'POST',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({
+                campaignId: currentCampaignId(),
+                amountCents,
+                locale: cfg.locale,
+              }),
+            });
+            if (!res.ok) throw new Error('create-order failed');
+            const data = await res.json();
+            return data.id;
+          },
+          onApprove: async (data: { orderID: string }) => {
+            setStatus(cfg.processing, '');
+            const res = await fetch('/api/paypal/capture-order', {
+              method: 'POST',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({ orderId: data.orderID, locale: cfg.locale }),
+            });
+            if (!res.ok) {
+              setStatus(cfg.error, 'error');
+              return;
+            }
+            buttonsHost.innerHTML = '';
+            form.querySelectorAll('fieldset, label, #donate-custom').forEach((el) =>
+              (el as HTMLElement).setAttribute('hidden', 'true'),
+            );
+            setStatus(`${cfg.thanksTitle} ${cfg.thanksBody}`, 'success');
+            window.dispatchEvent(new CustomEvent('campaign:refresh'));
+          },
+          onError: () => setStatus(cfg.error, 'error'),
+          onCancel: () => {
+            setStatus('', '');
+            startBtn.hidden = false;
+            startBtn.disabled = false;
+          },
+        })
+        .render('#paypal-buttons');
+    }
+  }
+</script>

@@ -1,0 +1,15 @@
+---
+import { swapLangPath, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const path = Astro.url.pathname;
+---
+
+<div class="lang-switch" aria-label="Sprache / Language">
+  <a href={swapLangPath(path, 'de')} hreflang="de" aria-current={lang === 'de' ? 'true' : 'false'}>DE</a>
+  <span aria-hidden="true">·</span>
+  <a href={swapLangPath(path, 'en')} hreflang="en" aria-current={lang === 'en' ? 'true' : 'false'}>EN</a>
+</div>

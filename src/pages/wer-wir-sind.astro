@@ -1,0 +1,9 @@
+---
+import Base from '../layouts/BaseLayout.astro';
+import About from '../views/About.astro';
+const lang = 'de' as const;
+---
+
+<Base lang={lang} title="Wer wir sind" description="Über den Verein, den Vorstand und die Satzung.">
+  <About lang={lang} />
+</Base>

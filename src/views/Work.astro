@@ -1,0 +1,110 @@
+---
+import { localizePath, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+type Block = { id: string; heading: string; lead?: string; body: string[]; sources?: string };
+type Copy = {
+  title: string;
+  intro: string;
+  campaignsNote: string;
+  whyAfrica: Block;
+  /** One entry per country. Add another object here when a new country starts. */
+  countries: Block[];
+};
+
+const copy: Record<Lang, Copy> = {
+  en: {
+    title: 'What we do',
+    intro:
+      'Project Humanity e.V. provides food, clothing, school supplies and healthcare for the poorest of the poor in the slums of Africa, regardless of religious preference or tribe. As a non-profit organization, every donation goes towards fighting extreme poverty in Africa.',
+    campaignsNote: 'You can see our current campaigns and their live totals on the',
+    whyAfrica: {
+      id: 'why-africa',
+      heading: 'Why Africa',
+      body: [
+        'Africa holds vast natural resources, yet its people are among the poorest in the world. Average income per person on the continent is around US$3,000 a year — roughly a tenth of the figure in the European Union — and over the past two centuries that gap has widened rather than closed.',
+        "In the UN Development Programme's 2025 Human Development Index, 23 of Africa's 54 countries fall into the “low human development” category. But poverty is never only a number on an income chart: it shapes every part of a person's life, from whether their children eat and go to school to whether a treatable illness becomes fatal.",
+        'Project Humanity e.V. works to change that — providing food, clothing, school supplies and healthcare to people in need, regardless of religion or tribe.',
+      ],
+      sources: 'Figures: UNDP Human Development Report 2025; IMF World Economic Outlook 2024.',
+    },
+    countries: [
+      {
+        id: 'sudan',
+        heading: 'What we do in Sudan',
+        lead: 'Sudan is the largest humanitarian crisis in the world today.',
+        body: [
+          'Sudan has endured decades of civil war. After long-time president Omar al-Bashir was removed in 2019, a fragile transition was cut short by a military coup in 2021. Since April 2023 the country has been engulfed in a full-scale war between the Sudanese Armed Forces and the Rapid Support Forces, now in its fourth year. Sudan sits near the bottom of the Human Development Index, ranked 176th of 193 countries.',
+          'Of Sudan’s roughly 51 million people, 33.7 million need humanitarian assistance in 2026 — more than in any other country, and about half of them children. Some 14 million people have been forced from their homes since April 2023: around 9 million remain displaced inside Sudan, the world’s largest internal displacement crisis, and about 4.4 million have fled to neighbouring countries. Roughly one in four Sudanese is now displaced.',
+          'About 19.5 million people — two in every five — face acute food insecurity, and an estimated 4.2 million children are expected to suffer acute malnutrition this year, more than 825,000 of them severely. Project Humanity is committed to helping the people of Sudan meet these needs and rebuild their lives.',
+        ],
+        sources:
+          'Figures: UN OCHA (Humanitarian Needs and Response Plan 2026), UNHCR, IPC (May 2026) and WFP/FAO/UNICEF, 2025–2026.',
+      },
+    ],
+  },
+  de: {
+    title: 'Was wir tun',
+    intro:
+      'Project Humanity e.V. bringt den ärmsten Menschen in den Slums Afrikas Nahrung, Kleidung, Schulmaterial und medizinische Versorgung – unabhängig von Religion oder Volkszugehörigkeit. Als gemeinnütziger Verein fließt jede Spende in den Kampf gegen die extreme Armut in Afrika.',
+    campaignsNote: 'Die laufenden Kampagnen mit ihrem Live-Spendenstand findest du auf der',
+    whyAfrica: {
+      id: 'why-africa',
+      heading: 'Warum Afrika',
+      body: [
+        'Afrika verfügt über enorme Bodenschätze – und dennoch gehören die Menschen auf dem Kontinent zu den ärmsten der Welt. Das durchschnittliche Pro-Kopf-Einkommen liegt bei rund 3.000 US-Dollar im Jahr, etwa einem Zehntel des Werts in der Europäischen Union. Über die vergangenen zwei Jahrhunderte hat sich dieser Abstand nicht verkleinert, sondern vergrößert.',
+        'Im Index der menschlichen Entwicklung 2025 des UN-Entwicklungsprogramms zählen 23 der 54 afrikanischen Länder zur Gruppe mit „niedriger menschlicher Entwicklung“. Doch Armut ist nie nur eine Zahl in einer Einkommensstatistik: Sie bestimmt jeden Bereich des Lebens – ob Kinder genug zu essen bekommen und zur Schule gehen und ob eine behandelbare Krankheit tödlich endet.',
+        'Genau hier setzt Project Humanity e.V. an und bringt Menschen in Not Nahrung, Kleidung, Schulmaterial und medizinische Versorgung – unabhängig von Religion oder Volkszugehörigkeit.',
+      ],
+      sources: 'Quellen: UNDP-Bericht über die menschliche Entwicklung 2025; IWF World Economic Outlook 2024.',
+    },
+    countries: [
+      {
+        id: 'sudan',
+        heading: 'Was wir im Sudan tun',
+        lead: 'Der Sudan ist derzeit die größte humanitäre Krise der Welt.',
+        body: [
+          'Der Sudan hat Jahrzehnte des Bürgerkriegs hinter sich. Nach dem Sturz des langjährigen Präsidenten Omar al-Baschir 2019 wurde der fragile Übergang durch einen Militärputsch 2021 gestoppt. Seit April 2023 herrscht ein offener Krieg zwischen den sudanesischen Streitkräften und der Rapid Support Forces, inzwischen im vierten Jahr. Im Index der menschlichen Entwicklung liegt der Sudan auf Platz 176 von 193 Ländern.',
+          'Von den rund 51 Millionen Einwohnern des Sudan sind 2026 33,7 Millionen auf humanitäre Hilfe angewiesen – mehr als in jedem anderen Land, etwa die Hälfte davon Kinder. Rund 14 Millionen Menschen wurden seit April 2023 aus ihren Häusern vertrieben: Etwa 9 Millionen sind innerhalb des Sudan auf der Flucht – die weltweit größte Binnenvertreibungskrise –, rund 4,4 Millionen sind in Nachbarländer geflohen. Etwa jede vierte Person im Sudan ist auf der Flucht.',
+          'Rund 19,5 Millionen Menschen – zwei von fünf – haben nicht ausreichend zu essen, und schätzungsweise 4,2 Millionen Kinder werden in diesem Jahr an akuter Mangelernährung leiden, mehr als 825.000 davon schwer. Project Humanity setzt sich dafür ein, den Menschen im Sudan zu helfen, diese Not zu lindern und sich ein neues Leben aufzubauen.',
+        ],
+        sources:
+          'Zahlen: UN OCHA (Humanitarian Needs and Response Plan 2026), UNHCR, IPC (Mai 2026) sowie WFP/FAO/UNICEF, 2025–2026.',
+      },
+    ],
+  },
+};
+
+const c = copy[lang];
+const blocks: Block[] = [c.whyAfrica, ...c.countries];
+---
+
+<article class="prose">
+  <h1>{c.title}</h1>
+  <p class="lede">{c.intro}</p>
+  <p>
+    {c.campaignsNote}{' '}
+    <a href={localizePath('/spenden', lang)}>{lang === 'de' ? 'Spendenseite' : 'donation page'}</a>.
+  </p>
+
+  {
+    blocks.map((block) => (
+      <section id={block.id}>
+        <h2>{block.heading}</h2>
+        {block.lead && (
+          <p>
+            <strong>{block.lead}</strong>
+          </p>
+        )}
+        {block.body.map((p) => (
+          <p>{p}</p>
+        ))}
+        {block.sources && <p class="bar__needed"><small>{block.sources}</small></p>}
+      </section>
+    ))
+  }
+</article>

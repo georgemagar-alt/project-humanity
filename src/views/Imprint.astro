@@ -1,0 +1,43 @@
+---
+import { type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<article class="prose">
+  <h1>{lang === 'de' ? 'Impressum' : 'Imprint'}</h1>
+
+  <p>
+    <strong>{lang === 'de' ? 'Platzhalter – bitte ausfüllen und rechtlich prüfen.' : 'Placeholder – fill in and have it checked legally.'}</strong>
+  </p>
+
+  <p>
+    Project Humanity e.&nbsp;V.<br />
+    Musterstraße 12<br />
+    12345 Musterstadt
+  </p>
+
+  <p>
+    {lang === 'de' ? 'Vertreten durch den Vorstand:' : 'Represented by the board:'}<br />
+    Vorname Nachname, Vorname Nachname
+  </p>
+
+  <p>
+    {lang === 'de' ? 'Registergericht:' : 'Register court:'} Amtsgericht Musterstadt,
+    {lang === 'de' ? ' Registernummer:' : ' register number:'} VR 12345
+  </p>
+
+  <p>
+    {lang === 'de' ? 'Kontakt:' : 'Contact:'}
+    <a href="mailto:info@your-domain.org">info@your-domain.org</a>
+  </p>
+
+  <p>
+    {lang === 'de'
+      ? 'Inhaltlich verantwortlich gemäß § 18 Abs. 2 MStV: Vorname Nachname, Anschrift wie oben.'
+      : 'Responsible for content under § 18 (2) MStV: First Last, address as above.'}
+  </p>
+</article>

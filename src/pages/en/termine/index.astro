@@ -1,0 +1,9 @@
+---
+import Base from '../../../layouts/BaseLayout.astro';
+import EventsIndex from '../../../views/EventsIndex.astro';
+const lang = 'en' as const;
+---
+
+<Base lang={lang} title="Events" description="Upcoming and past events of the association.">
+  <EventsIndex lang={lang} />
+</Base>

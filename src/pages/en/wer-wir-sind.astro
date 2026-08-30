@@ -1,0 +1,9 @@
+---
+import Base from '../../layouts/BaseLayout.astro';
+import About from '../../views/About.astro';
+const lang = 'en' as const;
+---
+
+<Base lang={lang} title="Who we are" description="About the association, the board and the statutes.">
+  <About lang={lang} />
+</Base>

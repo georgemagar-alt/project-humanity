@@ -1,0 +1,197 @@
+---
+import Base from '../../layouts/BaseLayout.astro';
+const lang = 'de' as const;
+---
+
+<Base lang={lang} title="Admin – Kampagnen">
+  <section id="admin-login">
+    <h1>Admin</h1>
+    <form class="stack" id="login-form">
+      <label>
+        Admin-Token
+        <input type="password" id="token" autocomplete="current-password" required />
+      </label>
+      <button class="btn" type="submit">Anmelden</button>
+      <p class="form-status" id="login-status" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <section id="admin-app" hidden>
+    <h1>Kampagnen verwalten</h1>
+    <p><button class="btn btn--ghost" id="logout">Abmelden</button></p>
+
+    <div id="campaigns"></div>
+
+    <h2>Neue Kampagne</h2>
+    <form class="stack" data-form="create">
+      <label>Slug (URL-Kürzel)<input name="slug" required placeholder="winterhilfe-2026" /></label>
+      <label>Titel (DE)<input name="title_de" required /></label>
+      <label>Titel (EN)<input name="title_en" required /></label>
+      <label>Beschreibung (DE)<textarea name="description_de"></textarea></label>
+      <label>Beschreibung (EN)<textarea name="description_en"></textarea></label>
+      <label>Ziel in Euro<input name="goal_euros" type="number" min="1" step="1" required /></label>
+      <label>Reihenfolge<input name="sort_order" type="number" value="0" step="1" /></label>
+      <label>Status
+        <select name="status">
+          <option value="active">active</option>
+          <option value="paused" selected>paused</option>
+          <option value="completed">completed</option>
+          <option value="archived">archived</option>
+        </select>
+      </label>
+      <button class="btn" type="submit">Anlegen</button>
+      <p class="form-status" role="status" aria-live="polite"></p>
+    </form>
+
+    <h2>Letzte Spenden</h2>
+    <div id="donations"></div>
+  </section>
+</Base>
+
+<script>
+  const KEY = 'humanity_admin_token';
+  const loginSection = document.getElementById('admin-login')!;
+  const appSection = document.getElementById('admin-app')!;
+  const loginForm = document.getElementById('login-form') as HTMLFormElement;
+  const loginStatus = document.getElementById('login-status')!;
+  const campaignsEl = document.getElementById('campaigns')!;
+  const donationsEl = document.getElementById('donations')!;
+
+  const euro = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' });
+  const token = () => sessionStorage.getItem(KEY) || '';
+
+  function esc(s: unknown): string {
+    return String(s ?? '').replace(/[&<>"]/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string),
+    );
+  }
+
+  async function api(method: 'GET' | 'POST', body?: unknown): Promise<Response> {
+    return fetch('/api/admin/campaigns', {
+      method,
+      headers: {
+        authorization: `Bearer ${token()}`,
+        ...(body ? { 'content-type': 'application/json' } : {}),
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  }
+
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const value = (document.getElementById('token') as HTMLInputElement).value.trim();
+    sessionStorage.setItem(KEY, value);
+    loginStatus.textContent = 'Prüfe …';
+    const res = await api('GET');
+    if (res.ok) {
+      loginStatus.textContent = '';
+      show();
+    } else {
+      sessionStorage.removeItem(KEY);
+      loginStatus.dataset.kind = 'error';
+      loginStatus.textContent = 'Token abgelehnt.';
+    }
+  });
+
+  document.getElementById('logout')!.addEventListener('click', () => {
+    sessionStorage.removeItem(KEY);
+    location.reload();
+  });
+
+  async function show() {
+    loginSection.hidden = true;
+    appSection.hidden = false;
+    await render();
+  }
+
+  async function render() {
+    const res = await api('GET');
+    if (!res.ok) {
+      sessionStorage.removeItem(KEY);
+      location.reload();
+      return;
+    }
+    const data = await res.json();
+    renderCampaigns(data.campaigns || []);
+    renderDonations(data.donations || []);
+  }
+
+  function renderCampaigns(list: any[]) {
+    campaignsEl.innerHTML = list
+      .map(
+        (c) => `
+      <form class="stack" data-form="update" data-id="${c.id}" style="border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1rem">
+        <strong>#${c.id} · ${esc(c.slug)}</strong>
+        <span class="bar__needed">${euro.format(c.raisedCents / 100)} / ${euro.format(c.goalCents / 100)} · ${c.donorCount} Spenden</span>
+        <label>Titel (DE)<input name="title_de" value="${esc(c.title.de)}" required></label>
+        <label>Titel (EN)<input name="title_en" value="${esc(c.title.en)}" required></label>
+        <label>Beschreibung (DE)<textarea name="description_de">${esc(c.description.de)}</textarea></label>
+        <label>Beschreibung (EN)<textarea name="description_en">${esc(c.description.en)}</textarea></label>
+        <label>Ziel in Euro<input name="goal_euros" type="number" min="1" step="1" value="${c.goalCents / 100}" required></label>
+        <label>Reihenfolge<input name="sort_order" type="number" step="1" value="${c.sort_order}"></label>
+        <label>Status
+          <select name="status">
+            ${['active', 'paused', 'completed', 'archived']
+              .map((s) => `<option value="${s}" ${s === c.status ? 'selected' : ''}>${s}</option>`)
+              .join('')}
+          </select>
+        </label>
+        <button class="btn" type="submit">Speichern</button>
+        <p class="form-status" role="status" aria-live="polite"></p>
+      </form>`,
+      )
+      .join('');
+  }
+
+  function renderDonations(list: any[]) {
+    if (!list.length) {
+      donationsEl.innerHTML = '<p>Noch keine Spenden.</p>';
+      return;
+    }
+    donationsEl.innerHTML = `<ul class="card-list">${list
+      .map(
+        (d) => `<li><article>
+          <time>${esc(d.created_at)}</time>
+          <div><strong>${euro.format(Number(d.gross_cents) / 100)}</strong> · ${esc(d.campaign_title)} · ${esc(d.status)}</div>
+          <div class="bar__needed">${esc(d.donor_name || '—')} · ${esc(d.donor_email || '—')}</div>
+        </article></li>`,
+      )
+      .join('')}</ul>`;
+  }
+
+  appSection.addEventListener('submit', async (e) => {
+    const form = e.target as HTMLElement;
+    if (!(form instanceof HTMLFormElement) || !form.dataset.form) return;
+    e.preventDefault();
+    const status = form.querySelector('.form-status') as HTMLElement;
+    const fd = new FormData(form);
+    const goalEuros = Number(fd.get('goal_euros'));
+    const payload: Record<string, unknown> = {
+      action: form.dataset.form === 'update' ? 'update' : 'create',
+      id: form.dataset.id ? Number(form.dataset.id) : undefined,
+      slug: fd.get('slug') || undefined,
+      title_de: fd.get('title_de'),
+      title_en: fd.get('title_en'),
+      description_de: fd.get('description_de') || '',
+      description_en: fd.get('description_en') || '',
+      goal_cents: Number.isFinite(goalEuros) ? Math.round(goalEuros * 100) : 0,
+      sort_order: Number(fd.get('sort_order') || 0),
+      status: fd.get('status') || 'paused',
+    };
+    status.removeAttribute('data-kind');
+    status.textContent = 'Speichere …';
+    const res = await api('POST', payload);
+    if (res.ok) {
+      status.dataset.kind = 'success';
+      status.textContent = 'Gespeichert.';
+      if (form.dataset.form === 'create') form.reset();
+      await render();
+    } else {
+      const err = await res.json().catch(() => ({}));
+      status.dataset.kind = 'error';
+      status.textContent = `Fehler: ${err.error || res.status}`;
+    }
+  });
+
+  if (token()) show();
+</script>

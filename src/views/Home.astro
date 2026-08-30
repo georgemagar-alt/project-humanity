@@ -1,0 +1,78 @@
+---
+import { useTranslations, localizePath, type Lang } from '../i18n/ui';
+import { getPublicCampaigns, type CampaignPublic } from '../lib/db';
+import { formatCents } from '../lib/money';
+import CampaignList from '../components/CampaignList.astro';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+let campaigns: CampaignPublic[] = [];
+try {
+  campaigns = await getPublicCampaigns();
+} catch {
+  campaigns = [];
+}
+
+const active = campaigns.filter((c) => c.status === 'active');
+const totalRaised = active.reduce((sum, c) => sum + c.raisedCents, 0);
+const totalDonors = active.reduce((sum, c) => sum + c.donorCount, 0);
+---
+
+<section class="hero">
+  <p class="eyebrow">{t('site.name')}</p>
+  <h1>
+    {lang === 'de'
+      ? 'Konkrete Hilfe für die Ärmsten in den Slums Afrikas.'
+      : 'Concrete help for the poorest people in the slums of Africa.'}
+  </h1>
+  <p class="lede">
+    {lang === 'de'
+      ? 'Project Humanity e.V. bringt Nahrung, Kleidung, Schulmaterial und medizinische Versorgung dorthin, wo sie am dringendsten gebraucht werden – unabhängig von Religion oder Herkunft. Als gemeinnütziger Verein sorgen wir dafür, dass jede Spende unmittelbar ankommt.'
+      : 'Project Humanity e.V. brings food, clothing, school supplies and healthcare to where they are needed most — regardless of religion or origin. As a non-profit, we make sure every donation arrives directly.'}
+  </p>
+  <div class="actions">
+    <a class="btn" href={localizePath('/spenden', lang)}>{t('nav.donate')}</a>
+    <a class="btn btn--ghost btn--on-dark" href={localizePath('/mitglied-werden', lang)}>
+      {t('nav.join')}
+    </a>
+  </div>
+  {
+    active.length > 0 && (
+      <p class="hero-stat">
+        <strong>{formatCents(totalRaised, lang)}</strong>{' '}
+        {lang === 'de'
+          ? `von ${active.length} ${active.length === 1 ? 'aktiver Kampagne' : 'aktiven Kampagnen'} gesammelt`
+          : `raised across ${active.length} active ${active.length === 1 ? 'campaign' : 'campaigns'}`}
+        {totalDonors > 0 &&
+          (lang === 'de'
+            ? ` · ${totalDonors} Unterstützer:innen`
+            : ` · ${totalDonors} supporters`)}
+      </p>
+    )
+  }
+</section>
+
+<section aria-labelledby="campaigns-h">
+  <p class="eyebrow">{lang === 'de' ? 'Jede Spende zählt' : 'Every donation counts'}</p>
+  <h2 id="campaigns-h">{lang === 'de' ? 'Aktuelle Kampagnen' : 'Current campaigns'}</h2>
+  <CampaignList lang={lang} campaigns={campaigns} />
+</section>
+
+<section>
+  <p class="eyebrow">{lang === 'de' ? 'Unser Ansatz' : 'Our approach'}</p>
+  <h2>{lang === 'de' ? 'So arbeiten wir' : 'How we work'}</h2>
+  <p class="lede">
+    {lang === 'de'
+      ? 'Christlich motiviert, ehrenamtlich getragen und projektbezogen – mit offener Abrechnung.'
+      : 'Christian-motivated, volunteer-run and project-based — with open accounting.'}
+  </p>
+  <p>
+    <a href={localizePath('/was-wir-tun', lang)}>
+      {lang === 'de' ? 'Warum wir uns auf Afrika und den Sudan konzentrieren' : 'Why we focus on Africa and Sudan'} →
+    </a>
+  </p>
+</section>

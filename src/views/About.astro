@@ -1,0 +1,107 @@
+---
+import { type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+type Section = { id: string; heading: string; body: string[] };
+type Copy = { title: string; intro?: string; sections: Section[]; statutes: string };
+
+const copy: Record<Lang, Copy> = {
+  en: {
+    title: 'Who we are',
+    sections: [
+      {
+        id: 'story',
+        heading: 'The Story',
+        body: [
+          "Early in the 1990s, a small group of Sudanese Christians left Sudan and eventually, their passion for caring for those in need and sharing God's grace became a reality. In December 2015, together with a group of friends, they founded Project Humanity e.V., a non-profit organization.",
+          "The team at Project Humanity is driven by the belief that God has called them to serve others, and they understand that giving is a crucial part of this calling. With a clear understanding of God's message on caring for those in need, Project Humanity is dedicated to acting on this calling and making a difference in the world.",
+        ],
+      },
+      {
+        id: 'mission',
+        heading: 'Our Mission',
+        body: [
+          'Inspired by our Christian faith, Project Humanity e.V. is dedicated to serving those in need. Our belief is that every person, regardless of their birthplace, deserves access to basic necessities such as food, clothing, healthcare, and education.',
+          'Our focus is on helping the poorest individuals in the slums of Africa, regardless of religion or tribe. As a non-profit organization, we ensure that every donation received goes directly towards fighting extreme poverty in Africa.',
+          'Join us in our mission to serve others and make a difference in the lives of those in need. Help us provide food, clothing, school supplies, and healthcare to those who need it most.',
+        ],
+      },
+      {
+        id: 'volunteers',
+        heading: 'Our Volunteers',
+        body: [
+          'Project Humanity e.V. values the tireless efforts of its volunteers who play a critical role in our mission to combat extreme poverty in the slums of Africa. We are grateful for the dedication of these individuals who donate their time, talent, and resources to support our cause.',
+          'Together, we can continue to make a positive impact in the fight against extreme poverty in Africa. We are proud of all that we have achieved so far and look forward to continuing our efforts with your support.',
+          'Thank you for your generosity and for making a difference in the lives of those in need.',
+        ],
+      },
+    ],
+    statutes: 'Statutes as PDF',
+  },
+  de: {
+    title: 'Wer wir sind',
+    sections: [
+      {
+        id: 'story',
+        heading: 'Unsere Geschichte',
+        body: [
+          'Anfang der 1990er-Jahre verließ eine kleine Gruppe sudanesischer Christen den Sudan. Mit der Zeit wurde ihr Herzensanliegen Wirklichkeit: für Menschen in Not zu sorgen und Gottes Gnade weiterzugeben. Im Dezember 2015 gründeten sie gemeinsam mit einem Kreis von Freundinnen und Freunden den gemeinnützigen Verein Project Humanity e.V.',
+          'Das Team von Project Humanity ist überzeugt, dass Gott uns dazu berufen hat, anderen zu dienen – und dass Geben ein wesentlicher Teil dieser Berufung ist. Aus dieser Überzeugung heraus handelt Project Humanity und setzt sich dafür ein, das Leben von Menschen in Not spürbar zu verändern.',
+        ],
+      },
+      {
+        id: 'mission',
+        heading: 'Unsere Mission',
+        body: [
+          'Getragen von unserem christlichen Glauben setzt sich Project Humanity e.V. für Menschen in Not ein. Wir sind überzeugt: Jeder Mensch – unabhängig von seinem Geburtsort – hat ein Recht auf das Nötigste zum Leben: Nahrung, Kleidung, medizinische Versorgung und Bildung.',
+          'Unser Fokus liegt auf den ärmsten Menschen in den Slums Afrikas – ungeachtet von Religion oder Volkszugehörigkeit. Als gemeinnütziger Verein stellen wir sicher, dass jede Spende unmittelbar in den Kampf gegen die extreme Armut in Afrika fließt.',
+          'Werde Teil unserer Mission, anderen zu dienen und das Leben von Menschen in Not zu verändern. Hilf uns, Nahrung, Kleidung, Schulmaterial und medizinische Versorgung dorthin zu bringen, wo sie am dringendsten gebraucht werden.',
+        ],
+      },
+      {
+        id: 'volunteers',
+        heading: 'Unsere Ehrenamtlichen',
+        body: [
+          'Project Humanity e.V. weiß den unermüdlichen Einsatz seiner Ehrenamtlichen zu schätzen. Sie spielen eine entscheidende Rolle in unserer Mission, die extreme Armut in den Slums Afrikas zu bekämpfen. Wir sind dankbar für alle, die ihre Zeit, ihre Fähigkeiten und ihre Mittel für unsere Sache einbringen.',
+          'Gemeinsam können wir im Kampf gegen die extreme Armut in Afrika weiterhin etwas bewegen. Wir sind stolz auf das bisher Erreichte und freuen uns darauf, unsere Arbeit mit deiner Unterstützung fortzusetzen.',
+          'Danke für deine Großzügigkeit und dafür, dass du das Leben von Menschen in Not veränderst.',
+        ],
+      },
+    ],
+    statutes: 'Satzung als PDF',
+  },
+};
+
+const c = copy[lang];
+---
+
+<article class="prose">
+  <h1>{c.title}</h1>
+
+  {
+    c.sections.map((section) => (
+      <section id={section.id}>
+        <h2>{section.heading}</h2>
+        {section.body.map((p) => (
+          <p>{p}</p>
+        ))}
+      </section>
+    ))
+  }
+
+  <section>
+    <p>
+      <a href="/satzung.pdf">{c.statutes}</a>
+      <span class="bar__needed">
+        {' '}
+        ({lang === 'de'
+          ? 'Datei nach public/satzung.pdf legen'
+          : 'place the file at public/satzung.pdf'})
+      </span>
+    </p>
+  </section>
+</article>

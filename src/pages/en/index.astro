@@ -1,0 +1,13 @@
+---
+import Base from '../../layouts/BaseLayout.astro';
+import Home from '../../views/Home.astro';
+const lang = 'en' as const;
+---
+
+<Base
+  lang={lang}
+  title="Home"
+  description="Non-profit association – project-based fundraising campaigns with a transparent, live total."
+>
+  <Home lang={lang} />
+</Base>

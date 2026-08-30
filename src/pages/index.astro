@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/BaseLayout.astro';
+import Home from '../views/Home.astro';
+const lang = 'de' as const;
+---
+
+<Base
+  lang={lang}
+  title="Start"
+  description="Gemeinnütziger Verein – projektbezogene Spendenkampagnen mit transparentem, live aktualisiertem Spendenstand."
+>
+  <Home lang={lang} />
+</Base>

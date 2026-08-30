@@ -1,0 +1,22 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/BaseLayout.astro';
+import NewsPost from '../../views/NewsPost.astro';
+
+const lang = 'de' as const;
+
+export const getStaticPaths = (async () => {
+  const posts = await getCollection('news', (e) => e.data.lang === 'de');
+  return posts.map((entry) => ({
+    params: { slug: entry.id.replace(/^de\//, '') },
+    props: { entry },
+  }));
+}) satisfies GetStaticPaths;
+
+const { entry } = Astro.props;
+---
+
+<Base lang={lang} title={entry.data.title} description={entry.data.summary}>
+  <NewsPost entry={entry} lang={lang} />
+</Base>

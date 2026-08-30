@@ -1,0 +1,75 @@
+---
+import { useTranslations, localizePath, type Lang } from '../i18n/ui';
+import LanguageSwitcher from './LanguageSwitcher.astro';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const here = Astro.url.pathname.replace(/\/$/, '') || '/';
+
+const items: { key: Parameters<typeof t>[0]; path: string }[] = [
+  { key: 'nav.about', path: '/wer-wir-sind' },
+  { key: 'nav.work', path: '/was-wir-tun' },
+  { key: 'nav.news', path: '/aktuelles' },
+  { key: 'nav.events', path: '/termine' },
+  { key: 'nav.donate', path: '/spenden' },
+  { key: 'nav.join', path: '/mitglied-werden' },
+  { key: 'nav.contact', path: '/kontakt' },
+];
+
+function isCurrent(path: string): boolean {
+  const target = localizePath(path, lang).replace(/\/$/, '') || '/';
+  return here === target || here.startsWith(target + '/');
+}
+---
+
+<header class="site-header" id="site-header">
+  <div class="container">
+    <a class="brand" href={localizePath('/', lang)}>Project Humanity</a>
+
+    <button
+      class="nav-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="primary-nav"
+    >
+      <span aria-hidden="true">☰</span>
+      {lang === 'de' ? 'Menü' : 'Menu'}
+    </button>
+
+    <nav class="site-nav" id="primary-nav" aria-label={lang === 'de' ? 'Hauptnavigation' : 'Main navigation'}>
+      <ul>
+        {items.map((item) => (
+          <li>
+            <a
+              href={localizePath(item.path, lang)}
+              aria-current={isCurrent(item.path) ? 'page' : undefined}
+            >
+              {t(item.key)}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <LanguageSwitcher lang={lang} />
+  </div>
+</header>
+
+<script>
+  const header = document.getElementById('site-header');
+  const toggle = header?.querySelector<HTMLButtonElement>('.nav-toggle');
+  toggle?.addEventListener('click', () => {
+    const open = header!.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+  // Collapse the mobile menu after following a link.
+  header?.querySelectorAll('.site-nav a').forEach((a) =>
+    a.addEventListener('click', () => {
+      header.classList.remove('open');
+      toggle?.setAttribute('aria-expanded', 'false');
+    }),
+  );
+</script>

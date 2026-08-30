@@ -1,0 +1,9 @@
+---
+import Base from '../../layouts/BaseLayout.astro';
+import Contact from '../../views/Contact.astro';
+const lang = 'en' as const;
+---
+
+<Base lang={lang} title="Contact" description="How to reach the association.">
+  <Contact lang={lang} />
+</Base>

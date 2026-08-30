@@ -1,0 +1,84 @@
+---
+import { useTranslations, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const strings = {
+  sending: t('join.sending'),
+  success: t('join.success'),
+  error: t('join.error'),
+  submit: t('join.submit'),
+};
+---
+
+<form class="stack" id="join-form" novalidate>
+  <input type="hidden" name="locale" value={lang} />
+
+  <label>
+    {t('join.name')}
+    <input type="text" name="name" required autocomplete="name" />
+  </label>
+  <label>
+    {t('join.email')}
+    <input type="email" name="email" required autocomplete="email" />
+  </label>
+  <label>
+    {t('join.phone')}
+    <input type="tel" name="phone" autocomplete="tel" />
+  </label>
+  <label>
+    {t('join.message')}
+    <textarea name="message"></textarea>
+  </label>
+
+  <!-- Honeypot: real users never fill this -->
+  <div class="hp" aria-hidden="true">
+    <label>Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+  </div>
+
+  <button type="submit" class="btn" id="join-submit">{t('join.submit')}</button>
+  <p class="form-status" id="join-status" role="status" aria-live="polite"></p>
+</form>
+
+<script type="application/json" id="join-strings" is:inline set:html={JSON.stringify(strings)} />
+
+<script>
+  const form = document.getElementById('join-form') as HTMLFormElement | null;
+  if (form) {
+    const cfg = JSON.parse(
+      document.getElementById('join-strings')?.textContent || '{}',
+    ) as Record<string, string>;
+    const btn = document.getElementById('join-submit') as HTMLButtonElement;
+    const status = document.getElementById('join-status') as HTMLElement;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      status.removeAttribute('data-kind');
+      status.textContent = cfg.sending;
+      btn.disabled = true;
+
+      const fd = new FormData(form);
+      const payload = Object.fromEntries(fd.entries());
+
+      try {
+        const res = await fetch('/api/membership', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        form.reset();
+        status.dataset.kind = 'success';
+        status.textContent = cfg.success;
+      } catch {
+        status.dataset.kind = 'error';
+        status.textContent = cfg.error;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
+</script>

@@ -1,0 +1,9 @@
+---
+import Base from '../../layouts/BaseLayout.astro';
+import Work from '../../views/Work.astro';
+const lang = 'en' as const;
+---
+
+<Base lang={lang} title="What we do" description="Our projects and how a fundraising campaign works.">
+  <Work lang={lang} />
+</Base>

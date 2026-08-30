@@ -1,0 +1,177 @@
+---
+import { useTranslations, localizePath, type Lang } from '../i18n/ui';
+import { formatCents, progressPercent } from '../lib/money';
+import type { CampaignPublic } from '../lib/db';
+
+interface Props {
+  lang: Lang;
+  campaigns: CampaignPublic[];
+  /** Show a "Donate" button on each card (hidden on the donation page itself). */
+  showDonateLink?: boolean;
+}
+const { lang, campaigns, showDonateLink = true } = Astro.props;
+const t = useTranslations(lang);
+
+const i18n = {
+  locale: lang,
+  raised: t('donate.raised'),
+  of: t('donate.of'),
+  needed: t('donate.needed'),
+  goalReached: t('donate.goalReached'),
+  donors: t('donate.donors'),
+};
+---
+
+<div class="campaign-grid" id="campaign-list" data-empty={campaigns.length === 0}>
+  {
+    campaigns.map((c) => {
+      const needed = Math.max(0, c.goalCents - c.raisedCents);
+      const pct = progressPercent(c.raisedCents, c.goalCents);
+      return (
+        <article class="campaign" data-campaign-id={c.id}>
+          <h3 data-field="title">{c.title[lang]}</h3>
+          {c.description[lang] && <p data-field="description">{c.description[lang]}</p>}
+
+          <div
+            class="bar"
+            role="progressbar"
+            aria-valuemin="0"
+            aria-valuemax={c.goalCents}
+            aria-valuenow={c.raisedCents}
+            aria-label={c.title[lang]}
+          >
+            <div class="bar__fill" data-field="fill" style={`width:${pct}%`} />
+          </div>
+
+          <div class="bar__meta">
+            <span class="amount" data-field="raised">{formatCents(c.raisedCents, lang)}</span>
+            <span class="amount--goal">
+              <span data-field="raisedLabel">{t('donate.raised')} {t('donate.of')}</span>{' '}
+              <span data-field="goal">{formatCents(c.goalCents, lang)}</span>
+            </span>
+          </div>
+
+          <p class="bar__needed" data-field="needed">
+            {needed > 0
+              ? `${formatCents(needed, lang)} ${t('donate.needed')}`
+              : t('donate.goalReached')}
+          </p>
+          <p class="bar__donors">
+            <span data-field="donors">{c.donorCount}</span>{' '}
+            <span data-field="donorsLabel">{t('donate.donors')}</span>
+          </p>
+
+          {showDonateLink && (
+            <div class="actions">
+              <a class="btn" href={localizePath('/spenden', lang)}>{t('nav.donate')}</a>
+            </div>
+          )}
+        </article>
+      );
+    })
+  }
+</div>
+
+<template id="campaign-tpl">
+  <article class="campaign">
+    <h3 data-field="title"></h3>
+    <p data-field="description"></p>
+    <div class="bar" role="progressbar" aria-valuemin="0">
+      <div class="bar__fill" data-field="fill" style="width:0%"></div>
+    </div>
+    <div class="bar__meta">
+      <span class="amount" data-field="raised"></span>
+      <span class="amount--goal">
+        <span data-field="raisedLabel"></span> <span data-field="goal"></span>
+      </span>
+    </div>
+    <p class="bar__needed" data-field="needed"></p>
+    <p class="bar__donors"><span data-field="donors"></span> <span data-field="donorsLabel"></span></p>
+  </article>
+</template>
+
+<script type="application/json" id="campaign-i18n" is:inline set:html={JSON.stringify(i18n)} />
+
+<script>
+  const cfg = JSON.parse(
+    document.getElementById('campaign-i18n')?.textContent || '{}',
+  ) as {
+    locale: 'de' | 'en';
+    raised: string;
+    of: string;
+    needed: string;
+    goalReached: string;
+    donors: string;
+  };
+
+  const fmt = new Intl.NumberFormat(cfg.locale === 'de' ? 'de-DE' : 'en-IE', {
+    style: 'currency',
+    currency: 'EUR',
+  });
+  const euro = (cents: number) => fmt.format(cents / 100);
+
+  interface ApiCampaign {
+    id: number;
+    slug: string;
+    title: { de: string; en: string };
+    description: { de: string; en: string };
+    goalCents: number;
+    raisedCents: number;
+    donorCount: number;
+  }
+
+  const list = document.getElementById('campaign-list');
+  const tpl = document.getElementById('campaign-tpl') as HTMLTemplateElement | null;
+  if (list) {
+    void refresh();
+    setInterval(refresh, 12_000);
+    window.addEventListener('campaign:refresh', () => void refresh());
+  }
+
+  async function refresh() {
+    try {
+      const res = await fetch('/api/campaigns', { headers: { accept: 'application/json' } });
+      if (!res.ok) return;
+      const data = (await res.json()) as { campaigns: ApiCampaign[] };
+      for (const c of data.campaigns) render(c);
+    } catch {
+      /* keep last known values */
+    }
+  }
+
+  function render(c: ApiCampaign) {
+    if (!list) return;
+    let card = list.querySelector<HTMLElement>(`[data-campaign-id="${c.id}"]`);
+    if (!card && tpl) {
+      card = tpl.content.firstElementChild!.cloneNode(true) as HTMLElement;
+      card.setAttribute('data-campaign-id', String(c.id));
+      const lang = cfg.locale;
+      setText(card, 'title', c.title[lang]);
+      setText(card, 'description', c.description[lang]);
+      setText(card, 'raisedLabel', `${cfg.raised} ${cfg.of}`);
+      setText(card, 'donorsLabel', cfg.donors);
+      list.appendChild(card);
+    }
+    if (!card) return;
+
+    const pct =
+      c.goalCents > 0 ? Math.min(100, Math.max(0, (c.raisedCents / c.goalCents) * 100)) : 0;
+    const needed = Math.max(0, c.goalCents - c.raisedCents);
+    const fill = card.querySelector<HTMLElement>('[data-field="fill"]');
+    if (fill) fill.style.width = pct.toFixed(2) + '%';
+    const bar = card.querySelector('.bar');
+    if (bar) {
+      bar.setAttribute('aria-valuemax', String(c.goalCents));
+      bar.setAttribute('aria-valuenow', String(c.raisedCents));
+    }
+    setText(card, 'raised', euro(c.raisedCents));
+    setText(card, 'goal', euro(c.goalCents));
+    setText(card, 'needed', needed > 0 ? `${euro(needed)} ${cfg.needed}` : cfg.goalReached);
+    setText(card, 'donors', String(c.donorCount));
+  }
+
+  function setText(root: HTMLElement, field: string, value: string) {
+    const el = root.querySelector<HTMLElement>(`[data-field="${field}"]`);
+    if (el && value) el.textContent = value;
+  }
+</script>

@@ -1,0 +1,70 @@
+---
+import { getCollection } from 'astro:content';
+import { useTranslations, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const all = (
+  await getCollection('events', (e) => e.data.lang === lang && !e.data.draft)
+).sort((a, b) => a.data.start.getTime() - b.data.start.getTime());
+
+const now = Date.now();
+const upcoming = all.filter((e) => (e.data.end ?? e.data.start).getTime() >= now);
+const past = all
+  .filter((e) => (e.data.end ?? e.data.start).getTime() < now)
+  .reverse();
+
+const fmt = new Intl.DateTimeFormat(lang === 'de' ? 'de-DE' : 'en-GB', {
+  dateStyle: 'full',
+  timeStyle: 'short',
+});
+
+const renderList = (items: typeof all) => items;
+---
+
+<section>
+  <h1>{t('nav.events')}</h1>
+
+  <h2>{t('events.upcoming')}</h2>
+  {
+    upcoming.length === 0 ? (
+      <p>{t('events.empty')}</p>
+    ) : (
+      <ul class="card-list">
+        {renderList(upcoming).map((ev) => (
+          <li>
+            <article>
+              <time datetime={ev.data.start.toISOString()}>{fmt.format(ev.data.start)}</time>
+              <h3 style="margin:.2rem 0">{ev.data.title}</h3>
+              {ev.data.location && <p><strong>{ev.data.location}</strong></p>}
+              {ev.data.summary && <p>{ev.data.summary}</p>}
+            </article>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  {
+    past.length > 0 && (
+      <>
+        <h2>{t('events.past')}</h2>
+        <ul class="card-list">
+          {renderList(past).map((ev) => (
+            <li>
+              <article>
+                <time datetime={ev.data.start.toISOString()}>{fmt.format(ev.data.start)}</time>
+                <h3 style="margin:.2rem 0">{ev.data.title}</h3>
+                {ev.data.location && <p>{ev.data.location}</p>}
+              </article>
+            </li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+</section>

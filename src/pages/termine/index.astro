@@ -1,0 +1,9 @@
+---
+import Base from '../../layouts/BaseLayout.astro';
+import EventsIndex from '../../views/EventsIndex.astro';
+const lang = 'de' as const;
+---
+
+<Base lang={lang} title="Termine" description="Anstehende und vergangene Termine des Vereins.">
+  <EventsIndex lang={lang} />
+</Base>

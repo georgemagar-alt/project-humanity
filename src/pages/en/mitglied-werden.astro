@@ -1,0 +1,9 @@
+---
+import Base from '../../layouts/BaseLayout.astro';
+import Join from '../../views/Join.astro';
+const lang = 'en' as const;
+---
+
+<Base lang={lang} title="Become a member" description="Join the association – send a request via the form.">
+  <Join lang={lang} />
+</Base>

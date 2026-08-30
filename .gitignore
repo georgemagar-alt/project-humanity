@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.astro/
+.netlify/
+.DS_Store
+npm-debug.log*
+
+# Env: keep the example, ignore real secrets
+.env
+.env.*
+!.env.example
+
+# Local dev database
+local.db
+local.db-*

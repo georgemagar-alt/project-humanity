@@ -1,0 +1,49 @@
+---
+import { getCollection } from 'astro:content';
+import { useTranslations, localizePath, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const posts = (
+  await getCollection('news', (e) => e.data.lang === lang && !e.data.draft)
+).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const stripPrefix = (id: string) => id.replace(/^(de|en)\//, '');
+const dateFmt = new Intl.DateTimeFormat(lang === 'de' ? 'de-DE' : 'en-GB', {
+  dateStyle: 'long',
+});
+---
+
+<section>
+  <h1>{t('nav.news')}</h1>
+  {
+    posts.length === 0 ? (
+      <p>{t('news.empty')}</p>
+    ) : (
+      <ul class="card-list">
+        {posts.map((post) => (
+          <li>
+            <article>
+              <time datetime={post.data.date.toISOString()}>
+                {dateFmt.format(post.data.date)}
+              </time>
+              <h2 style="margin:.2rem 0">
+                <a href={localizePath(`/aktuelles/${stripPrefix(post.id)}`, lang)}>
+                  {post.data.title}
+                </a>
+              </h2>
+              {post.data.summary && <p>{post.data.summary}</p>}
+              <a href={localizePath(`/aktuelles/${stripPrefix(post.id)}`, lang)}>
+                {t('news.readMore')} →
+              </a>
+            </article>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</section>

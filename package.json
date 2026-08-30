@@ -1,0 +1,25 @@
+{
+  "name": "project-humanity",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "db:schema": "node scripts/apply-schema.mjs",
+    "db:seed": "node scripts/seed.mjs"
+  },
+  "dependencies": {
+    "@astrojs/netlify": "^8.2.4",
+    "@libsql/client": "^0.17.4",
+    "astro": "^7.2.9",
+    "zod": "^4.5.2"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@types/node": "^26.4.0",
+    "typescript": "^5.9.3"
+  }
+}
