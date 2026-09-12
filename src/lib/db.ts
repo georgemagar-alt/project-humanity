@@ -94,48 +94,115 @@ export async function getCampaignRow(id: number): Promise<CampaignRow | null> {
   return (res.rows[0] as unknown as CampaignRow) ?? null;
 }
 
+export interface DonorInput {
+  salutation: string | null;
+  title: string | null;
+  firstName: string;
+  lastName: string;
+  company: string | null;
+  email: string;
+  phone: string | null;
+  street: string;
+  houseNo: string;
+  postalCode: string;
+  city: string;
+  country: string;
+  newsletterOptIn: boolean;
+}
+
 /**
- * Insert a completed donation. Idempotent on paypal_capture_id, so calling it
- * again for the same PayPal capture (e.g. from the webhook after the browser
- * flow) does not double-count.
+ * Create a donation in "pending" state with the donor details collected before
+ * payment, and the PayPal order id. Returns the new donation id, which we pass
+ * to PayPal as custom_id so capture/webhook can find this exact record.
  */
-export async function recordCompletedDonation(input: {
+export async function createPendingDonation(input: {
   campaignId: number;
   grossCents: number;
-  netCents: number | null;
   currency: string;
-  donorName: string | null;
-  donorEmail: string | null;
-  paypalOrderId: string;
-  paypalCaptureId: string;
   locale: 'de' | 'en';
-}): Promise<{ inserted: boolean; id: number | null }> {
+  paypalOrderId: string;
+  donor: DonorInput;
+}): Promise<number> {
+  const d = input.donor;
+  const donorName = `${d.firstName} ${d.lastName}`.trim();
   const res = await db().execute({
     sql: `INSERT INTO donations
-      (campaign_id, gross_cents, net_cents, currency, donor_name, donor_email,
-       paypal_order_id, paypal_capture_id, status, locale)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'completed', ?)
-      ON CONFLICT(paypal_capture_id) DO NOTHING`,
+      (campaign_id, gross_cents, currency, donor_name, donor_email,
+       salutation, title, first_name, last_name, company, phone,
+       street, house_no, postal_code, city, country,
+       newsletter_opt_in, consent_at, paypal_order_id, status, locale)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), ?, 'pending', ?)`,
     args: [
       input.campaignId,
       input.grossCents,
-      input.netCents,
       input.currency,
-      input.donorName,
-      input.donorEmail,
+      donorName,
+      d.email,
+      d.salutation,
+      d.title,
+      d.firstName,
+      d.lastName,
+      d.company,
+      d.phone,
+      d.street,
+      d.houseNo,
+      d.postalCode,
+      d.city,
+      d.country,
+      d.newsletterOptIn ? 1 : 0,
       input.paypalOrderId,
-      input.paypalCaptureId,
       input.locale,
     ],
   });
-  if (res.rowsAffected > 0) {
-    const row = await db().execute({
-      sql: 'SELECT id FROM donations WHERE paypal_capture_id = ?',
-      args: [input.paypalCaptureId],
-    });
-    return { inserted: true, id: Number(row.rows[0].id) };
-  }
-  return { inserted: false, id: null };
+  return Number(res.lastInsertRowid);
+}
+
+export interface CompletedDonation {
+  id: number;
+  campaignId: number;
+  grossCents: number;
+  locale: 'de' | 'en';
+  donorEmail: string | null;
+  donorName: string | null;
+  justCompleted: boolean;
+}
+
+/**
+ * Mark the pending donation for a PayPal order as completed. Idempotent: the
+ * capture id is only ever set once (guarded by `paypal_capture_id IS NULL`), so
+ * the browser capture and the webhook can both call this without double-counting.
+ * Returns the donation with `justCompleted` telling the caller whether THIS call
+ * was the one that completed it (so only it sends the thank-you email).
+ */
+export async function completeDonationByOrder(input: {
+  paypalOrderId: string;
+  paypalCaptureId: string;
+  grossCents: number;
+  netCents: number | null;
+}): Promise<CompletedDonation | null> {
+  const upd = await db().execute({
+    sql: `UPDATE donations
+      SET status = 'completed', paypal_capture_id = ?, gross_cents = ?, net_cents = ?,
+          completed_at = datetime('now')
+      WHERE paypal_order_id = ? AND paypal_capture_id IS NULL AND status = 'pending'`,
+    args: [input.paypalCaptureId, input.grossCents, input.netCents, input.paypalOrderId],
+  });
+  const row = await db().execute({
+    sql: `SELECT id, campaign_id, gross_cents, locale, donor_email, donor_name
+          FROM donations WHERE paypal_order_id = ? LIMIT 1`,
+    args: [input.paypalOrderId],
+  });
+  const r = row.rows[0];
+  if (!r) return null;
+  return {
+    id: Number(r.id),
+    campaignId: Number(r.campaign_id),
+    grossCents: Number(r.gross_cents),
+    locale: (String(r.locale) as 'de' | 'en'),
+    donorEmail: r.donor_email ? String(r.donor_email) : null,
+    donorName: r.donor_name ? String(r.donor_name) : null,
+    justCompleted: upd.rowsAffected > 0,
+  };
 }
 
 export async function markDonationRefunded(paypalCaptureId: string): Promise<void> {

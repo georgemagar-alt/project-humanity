@@ -13,6 +13,7 @@ const de = lang === 'de';
 const open = campaigns.filter((c) => c.status === 'active');
 const presets = [10, 25, 50, 100];
 
+// Strings the client script needs.
 const strings = {
   locale: lang,
   processing: t('donate.processing'),
@@ -25,8 +26,48 @@ const strings = {
   missingConfig: de
     ? 'Spenden per PayPal ist gerade nicht konfiguriert.'
     : 'PayPal donations are not configured right now.',
+  fillRequired: de ? 'Bitte alle Pflichtfelder (*) ausfüllen.' : 'Please fill in all required fields (*).',
+  consentRequired: de ? 'Bitte stimme der Datenverarbeitung zu.' : 'Please agree to the data processing.',
+  amounts: open.map((c) => ({ id: c.id, title: c.title[lang] })),
 };
 
+const L = de
+  ? {
+      step1: 'Meine Spende', step2: 'Meine Daten', step3: 'Zahlung',
+      campaign: 'Kampagne', chooseAmount: 'Betrag wählen', custom: 'Anderer Betrag (€)',
+      next: 'Weiter', back: 'Zurück', toPayment: 'Weiter zur Zahlung',
+      salutation: 'Anrede', title: 'Titel', please: '– bitte wählen –',
+      firstName: 'Vorname', lastName: 'Nachname', company: 'Unternehmen (optional)',
+      email: 'E-Mail', phone: 'Telefon (optional)', street: 'Straße', houseNo: 'Hausnr.',
+      postal: 'PLZ', city: 'Ort', country: 'Land',
+      newsletter: 'Ich möchte über Projekte und Neuigkeiten per E-Mail informiert werden.',
+      summary: 'Deine Spende', forCampaign: 'für',
+      consent: 'Ich willige ein, dass Project Humanity e.V. meine angegebenen Daten zur Abwicklung der Spende und für die spätere Spendenbescheinigung verarbeitet und speichert.',
+      redirectNote: 'Nach dem Klick auf den PayPal-Button wirst du sicher zu PayPal weitergeleitet.',
+      noReceipt: 'Hinweis: Die Bestätigungs-E-Mail ist noch keine Zuwendungsbestätigung im steuerlichen Sinne.',
+      mr: 'Herr', mrs: 'Frau', divers: 'Divers',
+    }
+  : {
+      step1: 'My donation', step2: 'My details', step3: 'Payment',
+      campaign: 'Campaign', chooseAmount: 'Choose an amount', custom: 'Other amount (€)',
+      next: 'Next', back: 'Back', toPayment: 'Continue to payment',
+      salutation: 'Salutation', title: 'Title', please: '– please choose –',
+      firstName: 'First name', lastName: 'Last name', company: 'Company (optional)',
+      email: 'Email', phone: 'Phone (optional)', street: 'Street', houseNo: 'No.',
+      postal: 'Postcode', city: 'City', country: 'Country',
+      newsletter: 'I would like to receive news about projects by email.',
+      summary: 'Your donation', forCampaign: 'for',
+      consent: 'I agree that Project Humanity e.V. stores and processes my data to handle the donation and for a later donation receipt.',
+      redirectNote: 'After clicking the PayPal button you will be securely redirected to PayPal.',
+      noReceipt: 'Note: the confirmation email is not yet an official tax donation receipt.',
+      mr: 'Mr', mrs: 'Mrs', divers: 'Diverse',
+    };
+
+const stepPill =
+  'flex items-center gap-2 text-sm font-semibold';
+const dot =
+  'grid place-items-center w-7 h-7 rounded-full text-sm font-bold shrink-0';
+const label = 'grid gap-1.5 text-sm font-semibold';
 const chip =
   'rounded-full border-2 border-line bg-white px-5 py-2 font-semibold cursor-pointer hover:border-gold ' +
   'aria-pressed:bg-gold aria-pressed:border-gold aria-pressed:text-ink';
@@ -38,38 +79,154 @@ const chip =
       {de ? 'Zurzeit läuft keine aktive Spendenkampagne.' : 'There is no active donation campaign right now.'}
     </p>
   ) : (
-    <form class="grid gap-6 max-w-xl" id="donate-form" novalidate>
-      {open.length > 1 && (
-        <label class="grid gap-1.5 font-semibold">
-          {t('donate.selectCampaign')}
-          <select id="donate-campaign" name="campaign" class="field">
-            {open.map((c) => (
-              <option value={c.id}>{c.title[lang]}</option>
+    <form class="max-w-xl" id="donate-form" novalidate>
+      {/* progress */}
+      <ol class="flex flex-wrap items-center gap-x-4 gap-y-2 mb-8" id="steps">
+        {[L.step1, L.step2, L.step3].map((s, i) => (
+          <li class={stepPill} data-stepdot={i + 1}>
+            <span class={`${dot} bg-sand-200 text-ink`} data-dot={i + 1}>{i + 1}</span>
+            <span class="text-muted" data-dotlabel={i + 1}>{s}</span>
+          </li>
+        ))}
+      </ol>
+
+      {/* Step 1 — amount */}
+      <section data-step="1">
+        {open.length > 1 && (
+          <label class={label}>
+            {L.campaign}
+            <select id="donate-campaign" name="campaign" class="field">
+              {open.map((c) => (
+                <option value={c.id}>{c.title[lang]}</option>
+              ))}
+            </select>
+          </label>
+        )}
+        {open.length === 1 && <input type="hidden" id="donate-campaign" value={open[0].id} />}
+
+        <fieldset class="border-0 p-0 m-0 mt-5">
+          <legend class="font-semibold mb-2">{L.chooseAmount}</legend>
+          <div class="flex flex-wrap gap-2.5" id="donate-presets">
+            {presets.map((p) => (
+              <button type="button" class={chip} data-cents={p * 100} aria-pressed={p === 25 ? 'true' : 'false'}>
+                {p} €
+              </button>
             ))}
-          </select>
+          </div>
+        </fieldset>
+
+        <label class={`${label} mt-5`}>
+          {L.custom}
+          <input type="number" id="donate-custom" class="field" inputmode="decimal" min="1" max="5000" step="1" placeholder="—" />
         </label>
-      )}
-      {open.length === 1 && <input type="hidden" id="donate-campaign" value={open[0].id} />}
 
-      <fieldset class="border-0 p-0 m-0">
-        <legend class="font-semibold mb-2">{t('donate.chooseAmount')}</legend>
-        <div class="flex flex-wrap gap-2.5" id="donate-presets">
-          {presets.map((p) => (
-            <button type="button" class={chip} data-cents={p * 100} aria-pressed={p === 25 ? 'true' : 'false'}>
-              {p} €
-            </button>
-          ))}
+        <div class="mt-8">
+          <button type="button" class="btn" data-next>{L.next} →</button>
         </div>
-      </fieldset>
+      </section>
 
-      <label class="grid gap-1.5 font-semibold">
-        {t('donate.customAmount')}
-        <input type="number" id="donate-custom" class="field" inputmode="decimal" min="1" max="5000" step="1" placeholder="—" />
-      </label>
+      {/* Step 2 — donor details */}
+      <section data-step="2" hidden>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <label class={label}>
+            {L.salutation}
+            <select name="salutation" class="field">
+              <option value="">{L.please}</option>
+              <option value={L.mr}>{L.mr}</option>
+              <option value={L.mrs}>{L.mrs}</option>
+              <option value={L.divers}>{L.divers}</option>
+            </select>
+          </label>
+          <label class={label}>
+            {L.title}
+            <input type="text" name="title" class="field" autocomplete="honorific-prefix" />
+          </label>
+          <label class={label}>
+            {L.firstName} <span class="text-gold-700">*</span>
+            <input type="text" name="firstName" class="field" required autocomplete="given-name" />
+          </label>
+          <label class={label}>
+            {L.lastName} <span class="text-gold-700">*</span>
+            <input type="text" name="lastName" class="field" required autocomplete="family-name" />
+          </label>
+          <label class={`${label} sm:col-span-2`}>
+            {L.email} <span class="text-gold-700">*</span>
+            <input type="email" name="email" class="field" required autocomplete="email" />
+          </label>
+          <label class={`${label} sm:col-span-2`}>
+            {L.company}
+            <input type="text" name="company" class="field" autocomplete="organization" />
+          </label>
+          <label class={`${label} sm:col-span-2`}>
+            {L.phone}
+            <input type="tel" name="phone" class="field" autocomplete="tel" />
+          </label>
+          <label class={`${label} sm:col-span-2`}>
+            {L.street} <span class="text-gold-700">*</span>
+            <input type="text" name="street" class="field" required autocomplete="address-line1" />
+          </label>
+          <label class={label}>
+            {L.houseNo} <span class="text-gold-700">*</span>
+            <input type="text" name="houseNo" class="field" required />
+          </label>
+          <label class={label}>
+            {L.postal} <span class="text-gold-700">*</span>
+            <input type="text" name="postalCode" class="field" required autocomplete="postal-code" />
+          </label>
+          <label class={label}>
+            {L.city} <span class="text-gold-700">*</span>
+            <input type="text" name="city" class="field" required autocomplete="address-level2" />
+          </label>
+          <label class={label}>
+            {L.country} <span class="text-gold-700">*</span>
+            <input type="text" name="country" class="field" required value="Deutschland" autocomplete="country-name" />
+          </label>
+        </div>
 
-      <button type="submit" class="btn" id="donate-start">{t('donate.button')}</button>
-      <p class="m-0 min-h-[1.2em] font-semibold data-[kind=error]:text-red-700 data-[kind=success]:text-gold-700" id="donate-status" role="status" aria-live="polite"></p>
-      <div id="paypal-buttons"></div>
+        <label class="flex items-start gap-2.5 mt-5 font-medium">
+          <input type="checkbox" name="newsletterOptIn" class="mt-1" />
+          <span>{L.newsletter}</span>
+        </label>
+
+        <div class="mt-8 flex flex-wrap gap-3">
+          <button type="button" class="btn btn-outline" data-prev>← {L.back}</button>
+          <button type="button" class="btn" data-next>{L.toPayment} →</button>
+        </div>
+      </section>
+
+      {/* Step 3 — payment */}
+      <section data-step="3" hidden>
+        <div class="card bg-sand border-line p-5">
+          <div class="flex items-baseline justify-between gap-3">
+            <span class="font-semibold">{L.summary}</span>
+            <span class="font-display text-2xl font-bold" id="summary-amount">—</span>
+          </div>
+          <p class="text-muted text-sm mt-1"><span>{L.forCampaign}</span> <span id="summary-campaign">—</span></p>
+        </div>
+
+        <label class="flex items-start gap-2.5 mt-5 font-medium">
+          <input type="checkbox" name="consent" id="donate-consent" class="mt-1" required />
+          <span>{L.consent} <span class="text-gold-700">*</span></span>
+        </label>
+
+        <p class="text-sm text-muted mt-4">{L.redirectNote}</p>
+
+        <div id="paypal-buttons" class="mt-4"></div>
+        <p class="m-0 mt-2 min-h-[1.2em] font-semibold data-[kind=error]:text-red-700 data-[kind=success]:text-gold-700" id="donate-status" role="status" aria-live="polite"></p>
+
+        <div class="mt-6">
+          <button type="button" class="btn btn-outline" data-prev>← {L.back}</button>
+        </div>
+        <p class="text-sm text-muted mt-6">{L.noReceipt}</p>
+      </section>
+
+      {/* Success */}
+      <section data-step="done" hidden>
+        <div class="card border-gold p-6 text-center">
+          <div class="font-display text-2xl font-bold text-gold-700">{t('donate.thanksTitle')}</div>
+          <p class="mt-2 text-muted">{t('donate.thanksBody')}</p>
+        </div>
+      </section>
     </form>
   )
 }
@@ -85,32 +242,33 @@ const chip =
   function init(form: HTMLFormElement) {
     const cfg = JSON.parse(
       document.getElementById('donate-strings')?.textContent || '{}',
-    ) as Record<string, string>;
+    ) as Record<string, any>;
 
+    const euro = new Intl.NumberFormat(cfg.locale === 'de' ? 'de-DE' : 'en-IE', {
+      style: 'currency',
+      currency: 'EUR',
+    });
+
+    const sections = Array.from(form.querySelectorAll<HTMLElement>('[data-step]'));
+    const campaignEl = document.getElementById('donate-campaign') as HTMLSelectElement | HTMLInputElement | null;
     const presetsWrap = document.getElementById('donate-presets');
     const custom = document.getElementById('donate-custom') as HTMLInputElement | null;
-    const campaignEl = document.getElementById('donate-campaign') as
-      | HTMLSelectElement
-      | HTMLInputElement
-      | null;
-    const startBtn = document.getElementById('donate-start') as HTMLButtonElement;
     const status = document.getElementById('donate-status') as HTMLElement;
-    const buttonsHost = document.getElementById('paypal-buttons') as HTMLElement;
+    const consent = document.getElementById('donate-consent') as HTMLInputElement | null;
 
+    let step = 1;
     let amountCents = 2500;
     let sdkPromise: Promise<void> | null = null;
     let buttonsRendered = false;
 
+    // --- amount selection ---
     presetsWrap?.addEventListener('click', (e) => {
       const btn = (e.target as HTMLElement).closest('button[data-cents]') as HTMLButtonElement | null;
       if (!btn) return;
       amountCents = Number(btn.dataset.cents);
       if (custom) custom.value = '';
-      presetsWrap
-        .querySelectorAll('button')
-        .forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      presetsWrap.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
     });
-
     custom?.addEventListener('input', () => {
       const euros = Number(custom.value.replace(',', '.'));
       if (Number.isFinite(euros) && euros > 0) {
@@ -120,6 +278,11 @@ const chip =
     });
 
     const currentCampaignId = () => Number(campaignEl?.value || 0);
+    const campaignTitle = () => {
+      const id = currentCampaignId();
+      const found = (cfg.amounts as Array<{ id: number; title: string }>).find((a) => a.id === id);
+      return found ? found.title : '';
+    };
 
     function setStatus(msg: string, kind: 'error' | 'success' | '') {
       status.textContent = msg;
@@ -127,29 +290,108 @@ const chip =
       else status.removeAttribute('data-kind');
     }
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      setStatus('', '');
+    function showStep(n: number | 'done') {
+      sections.forEach((s) => (s.hidden = s.dataset.step !== String(n)));
+      // progress dots
+      for (let i = 1; i <= 3; i++) {
+        const d = form.querySelector<HTMLElement>(`[data-dot="${i}"]`);
+        const lab = form.querySelector<HTMLElement>(`[data-dotlabel="${i}"]`);
+        const active = typeof n === 'number' && i <= n;
+        if (d) {
+          d.classList.toggle('bg-gold', active);
+          d.classList.toggle('text-ink', true);
+          d.classList.toggle('bg-sand-200', !active);
+        }
+        if (lab) lab.classList.toggle('text-ink', active);
+      }
+      if (typeof n === 'number') step = n;
+      form.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    }
+
+    // --- validation per step ---
+    function validStep1(): boolean {
+      if (!(amountCents >= 100 && amountCents <= 500000)) {
+        setStatus(cfg.invalidAmount, 'error');
+        return false;
+      }
+      return true;
+    }
+    function requiredNames() {
+      return ['firstName', 'lastName', 'email', 'street', 'houseNo', 'postalCode', 'city', 'country'];
+    }
+    function validStep2(): boolean {
+      for (const name of requiredNames()) {
+        const el = form.elements.namedItem(name) as HTMLInputElement | null;
+        if (!el || !el.value.trim()) {
+          setStatus(cfg.fillRequired, 'error');
+          el?.focus();
+          return false;
+        }
+      }
+      const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+        setStatus(cfg.fillRequired, 'error');
+        return false;
+      }
+      return true;
+    }
+
+    function collectDonor() {
+      const v = (n: string) => ((form.elements.namedItem(n) as HTMLInputElement | null)?.value ?? '').trim();
+      return {
+        salutation: v('salutation') || null,
+        title: v('title') || null,
+        firstName: v('firstName'),
+        lastName: v('lastName'),
+        company: v('company') || null,
+        email: v('email'),
+        phone: v('phone') || null,
+        street: v('street'),
+        houseNo: v('houseNo'),
+        postalCode: v('postalCode'),
+        city: v('city'),
+        country: v('country') || 'Deutschland',
+        newsletterOptIn: (form.elements.namedItem('newsletterOptIn') as HTMLInputElement | null)?.checked === true,
+      };
+    }
+
+    // --- navigation ---
+    form.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('[data-next]')) {
+        setStatus('', '');
+        if (step === 1 && validStep1()) showStep(2);
+        else if (step === 2 && validStep2()) {
+          updateSummary();
+          showStep(3);
+          void preparePayPal();
+        }
+      } else if (target.closest('[data-prev]')) {
+        setStatus('', '');
+        showStep(step - 1);
+      }
+    });
+
+    function updateSummary() {
+      const amt = document.getElementById('summary-amount');
+      const camp = document.getElementById('summary-campaign');
+      if (amt) amt.textContent = euro.format(amountCents / 100);
+      if (camp) camp.textContent = campaignTitle();
+    }
+
+    // --- PayPal ---
+    async function preparePayPal() {
       if (!PAYPAL_CLIENT_ID) {
         setStatus(cfg.missingConfig, 'error');
         return;
       }
-      if (!(amountCents >= 100 && amountCents <= 500000)) {
-        setStatus(cfg.invalidAmount, 'error');
-        return;
-      }
-      startBtn.disabled = true;
-      setStatus(cfg.processing, '');
       try {
         await loadSdk();
         renderButtons();
-        startBtn.hidden = true;
-        setStatus('', '');
       } catch {
         setStatus(cfg.error, 'error');
-        startBtn.disabled = false;
       }
-    });
+    }
 
     function loadSdk(): Promise<void> {
       if (sdkPromise) return sdkPromise;
@@ -160,7 +402,7 @@ const chip =
           currency: 'EUR',
           intent: 'capture',
           components: 'buttons',
-          'disable-funding': 'paylater,credit',
+          'disable-funding': 'paylater',
         });
         s.src = `https://www.paypal.com/sdk/js?${params.toString()}`;
         s.onload = () => resolve();
@@ -178,6 +420,11 @@ const chip =
         .Buttons({
           style: { layout: 'vertical', label: 'donate' },
           createOrder: async () => {
+            if (!consent?.checked) {
+              setStatus(cfg.consentRequired, 'error');
+              throw new Error('consent required');
+            }
+            setStatus('', '');
             const res = await fetch('/api/paypal/create-order', {
               method: 'POST',
               headers: { 'content-type': 'application/json' },
@@ -185,6 +432,8 @@ const chip =
                 campaignId: currentCampaignId(),
                 amountCents,
                 locale: cfg.locale,
+                consent: true,
+                ...collectDonor(),
               }),
             });
             if (!res.ok) throw new Error('create-order failed');
@@ -201,19 +450,11 @@ const chip =
               setStatus(cfg.error, 'error');
               return;
             }
-            buttonsHost.innerHTML = '';
-            form
-              .querySelectorAll('fieldset, label, #donate-custom')
-              .forEach((el) => (el as HTMLElement).setAttribute('hidden', 'true'));
-            setStatus(`${cfg.thanksTitle} ${cfg.thanksBody}`, 'success');
+            showStep('done');
             window.dispatchEvent(new CustomEvent('campaign:refresh'));
           },
           onError: () => setStatus(cfg.error, 'error'),
-          onCancel: () => {
-            setStatus('', '');
-            startBtn.hidden = false;
-            startBtn.disabled = false;
-          },
+          onCancel: () => setStatus('', ''),
         })
         .render('#paypal-buttons');
     }

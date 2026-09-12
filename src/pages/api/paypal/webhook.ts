@@ -3,7 +3,7 @@ import {
   getPublicCampaign,
   markDonationEmailSent,
   markDonationRefunded,
-  recordCompletedDonation,
+  completeDonationByOrder,
 } from '../../../lib/db';
 import {
   parseCaptureFromWebhookResource,
@@ -44,45 +44,37 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     if (type === 'PAYMENT.CAPTURE.COMPLETED') {
       const info = parseCaptureFromWebhookResource(resource);
-      if (info?.campaignId && info.captureId) {
-        const rec = await recordCompletedDonation({
-          campaignId: info.campaignId,
+      const orderId = info?.orderId;
+      if (info?.captureId && orderId) {
+        // Idempotent: completes the pending donation created at checkout time,
+        // matched by the PayPal order id. Safe to run after the browser already
+        // captured (justCompleted will be false then).
+        const donation = await completeDonationByOrder({
+          paypalOrderId: orderId,
+          paypalCaptureId: info.captureId,
           grossCents: info.grossCents,
           netCents: info.netCents,
-          currency: info.currency,
-          donorName: info.payerName,
-          donorEmail: info.payerEmail,
-          paypalOrderId: info.orderId ?? '',
-          paypalCaptureId: info.captureId,
-          locale: 'de',
         });
-        // Only reachable if the browser capture flow never completed. Send the
-        // thank-you here too, if the webhook carried a payer email.
-        if (rec.inserted && rec.id && info.payerEmail) {
-          const campaign = await getPublicCampaign(info.campaignId);
+        if (donation?.justCompleted && donation.donorEmail) {
+          const campaign = await getPublicCampaign(donation.campaignId);
           await sendDonationThankYou({
-            toEmail: info.payerEmail,
-            toName: info.payerName,
-            locale: 'de',
-            amountCents: info.grossCents,
-            campaignTitle: campaign?.title.de ?? 'Kampagne',
+            toEmail: donation.donorEmail,
+            toName: donation.donorName,
+            locale: donation.locale,
+            amountCents: donation.grossCents,
+            campaignTitle: campaign?.title[donation.locale] ?? campaign?.title.de ?? 'Kampagne',
           });
-          await markDonationEmailSent(rec.id);
-        } else if (rec.inserted) {
-          console.warn('donation recorded via webhook without payer email', info.captureId);
+          await markDonationEmailSent(donation.id);
         }
       }
-    } else if (
-      type === 'PAYMENT.CAPTURE.REFUNDED' ||
-      type === 'PAYMENT.CAPTURE.REVERSED'
-    ) {
+    } else if (type === 'PAYMENT.CAPTURE.REFUNDED' || type === 'PAYMENT.CAPTURE.REVERSED') {
       const captureId = originalCaptureId(resource);
       if (captureId) await markDonationRefunded(captureId);
     }
   } catch (err) {
     console.error(`webhook handler error for ${type}`, err);
-    // 200 anyway: PayPal retries on non-2xx, and the browser flow is the
-    // primary path. Errors are logged for manual reconciliation.
+    // Still 200: PayPal retries on non-2xx, and the browser flow is the primary
+    // path. Errors are logged for manual reconciliation.
   }
 
   return new Response('ok');

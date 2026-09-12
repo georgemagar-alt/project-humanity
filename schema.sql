@@ -28,12 +28,27 @@ CREATE TABLE IF NOT EXISTS donations (
   donor_name        TEXT,
   donor_email       TEXT,
   message           TEXT,
+  -- Donor details collected before payment (for records and future receipts)
+  salutation        TEXT,
+  title             TEXT,
+  first_name        TEXT,
+  last_name         TEXT,
+  company           TEXT,
+  phone             TEXT,
+  street            TEXT,
+  house_no          TEXT,
+  postal_code       TEXT,
+  city              TEXT,
+  country           TEXT,
+  newsletter_opt_in INTEGER NOT NULL DEFAULT 0,
+  consent_at        TEXT,
   paypal_order_id   TEXT,
   paypal_capture_id TEXT    UNIQUE,
   status            TEXT    NOT NULL DEFAULT 'pending'
                     CHECK (status IN ('pending','completed','refunded')),
   locale            TEXT    NOT NULL DEFAULT 'de' CHECK (locale IN ('de','en')),
   email_sent_at     TEXT,
+  completed_at      TEXT,
   created_at        TEXT    NOT NULL DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_donations_campaign_status
