@@ -226,6 +226,11 @@ const chip =
           <div class="font-display text-2xl font-bold text-gold-700">{t('donate.thanksTitle')}</div>
           <p class="mt-2 text-muted">{t('donate.thanksBody')}</p>
         </div>
+        <div class="mt-6 text-center">
+          <button type="button" class="btn btn-outline" data-restart>
+            {de ? 'Weitere Spende' : 'Donate again'}
+          </button>
+        </div>
       </section>
     </form>
   )
@@ -369,8 +374,23 @@ const chip =
       } else if (target.closest('[data-prev]')) {
         setStatus('', '');
         showStep(step - 1);
+      } else if (target.closest('[data-restart]')) {
+        resetForm();
       }
     });
+
+    function resetForm() {
+      form.reset();
+      amountCents = 2500;
+      presetsWrap?.querySelectorAll('button').forEach((b) =>
+        b.setAttribute('aria-pressed', String((b as HTMLElement).dataset.cents === '2500')),
+      );
+      const host = document.getElementById('paypal-buttons');
+      if (host) host.innerHTML = '';
+      buttonsRendered = false;
+      setStatus('', '');
+      showStep(1);
+    }
 
     function updateSummary() {
       const amt = document.getElementById('summary-amount');
