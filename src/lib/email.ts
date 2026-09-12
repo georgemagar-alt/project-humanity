@@ -73,14 +73,14 @@ export async function sendDonationThankYou(input: {
           subject: `Thank you for your donation to ${ORG_NAME}`,
           hello: greeting ? `Hello ${greeting},` : 'Hello,',
           body: `thank you very much for your donation of <strong>${amount}</strong> to the campaign “${campaign}”. Your contribution goes directly into this project.`,
-          note: 'This email is a confirmation, not an official donation receipt for tax purposes.',
+          note: 'This email confirms your donation. For donations up to €300 you can claim it together with your PayPal receipt. If you would like a formal donation receipt, simply reply to this email.',
           regards: 'Warm regards',
         }
       : {
           subject: `Danke für deine Spende an ${ORG_NAME}`,
           hello: greeting ? `Hallo ${greeting},` : 'Hallo,',
           body: `vielen Dank für deine Spende von <strong>${amount}</strong> für die Kampagne „${campaign}“. Dein Beitrag fließt direkt in dieses Projekt.`,
-          note: 'Diese E-Mail ist eine Bestätigung, aber keine Zuwendungsbestätigung im steuerlichen Sinne.',
+          note: 'Diese E-Mail bestätigt deine Spende. Für Spenden bis 300 € kannst du sie zusammen mit deinem PayPal-Beleg beim Finanzamt geltend machen. Wenn du eine förmliche Zuwendungsbestätigung möchtest, antworte einfach auf diese E-Mail.',
           regards: 'Herzliche Grüße',
         };
 
