@@ -1,4 +1,9 @@
-import { createClient, type Client, type Row } from '@libsql/client';
+// Use the web build (pure HTTP over fetch — no native bindings, no WebSocket),
+// which is what works reliably inside Netlify's serverless functions. It talks to
+// the same Turso database via libsql:// / https:// URLs; it does NOT support
+// file: URLs, so local dev must also point at a hosted Turso database.
+import { createClient } from '@libsql/client/web';
+import type { Client, Row } from '@libsql/client';
 import { requireEnv, optionalEnv } from './env';
 
 let client: Client | null = null;
