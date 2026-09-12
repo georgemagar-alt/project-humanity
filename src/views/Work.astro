@@ -1,10 +1,26 @@
 ---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import { localizePath, type Lang } from '../i18n/ui';
+import boyImg from '../assets/images/boy.jpg';
+import girlStrongImg from '../assets/images/girl-strong.jpg';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
+
+// Photo shown alongside each block, keyed by block id.
+const blockImages: Record<string, { src: ImageMetadata; alt: { de: string; en: string } }> = {
+  'why-africa': {
+    src: girlStrongImg,
+    alt: { de: 'Ein Mädchen blickt in die Kamera.', en: 'A girl looking into the camera.' },
+  },
+  sudan: {
+    src: boyImg,
+    alt: { de: 'Ein Junge steht vor einem Lehmgebäude.', en: 'A boy standing in front of a mud-brick building.' },
+  },
+};
 
 type Block = { id: string; heading: string; lead?: string; body: string[]; sources?: string };
 type Copy = {
@@ -97,6 +113,18 @@ const blocks: Block[] = [c.whyAfrica, ...c.countries];
       blocks.map((block) => (
         <section id={block.id}>
           <h2>{block.heading}</h2>
+          {blockImages[block.id] && (
+            <div class="my-6 overflow-clip rounded-[10px] shadow-sm">
+              <Image
+                src={blockImages[block.id].src}
+                alt={blockImages[block.id].alt[lang]}
+                widths={[480, 720, 960]}
+                sizes="(min-width:1024px) 44rem, 100vw"
+                class="w-full object-cover aspect-[3/2] object-[50%_30%]"
+                loading="lazy"
+              />
+            </div>
+          )}
           {block.lead && (
             <p class="text-lg font-semibold text-ink">{block.lead}</p>
           )}

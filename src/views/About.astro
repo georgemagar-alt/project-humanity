@@ -1,10 +1,13 @@
 ---
+import { Image } from 'astro:assets';
 import { type Lang } from '../i18n/ui';
+import girlImg from '../assets/images/girl.jpg';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
+const de = lang === 'de';
 
 type Section = { id: string; heading: string; body: string[] };
 type Copy = { title: string; intro?: string; sections: Section[]; statutes: string };
@@ -80,10 +83,23 @@ const c = copy[lang];
 ---
 
 <div class="container-page py-16 lg:py-20">
-  <article class="prose-page">
+  <div class="prose-page">
     <p class="eyebrow">{lang === 'de' ? 'Über uns' : 'About us'}</p>
-    <h1 class="text-4xl sm:text-5xl font-bold mb-8">{c.title}</h1>
+    <h1 class="text-4xl sm:text-5xl font-bold">{c.title}</h1>
+  </div>
 
+  <div class="mt-8 mb-12 overflow-clip rounded-[10px] shadow-sm">
+    <Image
+      src={girlImg}
+      alt={de ? 'Ein Mädchen mit einem Kreuz um den Hals.' : 'A girl wearing a cross necklace.'}
+      widths={[720, 1080, 1440]}
+      sizes="(min-width:1024px) 70rem, 100vw"
+      class="w-full object-cover aspect-[16/10] sm:aspect-[16/8] object-[50%_35%]"
+      loading="eager"
+    />
+  </div>
+
+  <article class="prose-page">
     {
       c.sections.map((section) => (
         <section id={section.id}>

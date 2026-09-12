@@ -13,3 +13,4 @@ npm-debug.log*
 # Local dev database
 local.db
 local.db-*
+/Assets/
