@@ -33,6 +33,9 @@ const stats = [
 
 <!-- Hero -->
 <section class="relative isolate overflow-clip bg-ink text-white">
+  <!-- The hero photo is high-key B&W; we brighten/boost it so the children read
+       vividly, and keep the dark scrim to the left (behind the text) so the right
+       side stays bright and joyful. -->
   <Image
     src={heroImg}
     alt=""
@@ -40,13 +43,12 @@ const stats = [
     sizes="100vw"
     loading="eager"
     fetchpriority="high"
-    class="absolute inset-0 -z-20 h-full w-full object-cover object-[50%_42%]"
+    style="filter:contrast(1.2) brightness(1.13)"
+    class="absolute inset-0 -z-20 h-full w-full object-cover object-[50%_40%]"
   />
-  <!-- Scrim: the hero photo is high-key B&W, so a strong dark gradient keeps the
-       white headline legible on every screen. Darkest at the bottom-left where the text sits. -->
   <div
     class="absolute inset-0 -z-10"
-    style="background:linear-gradient(to top, rgba(20,17,12,.94) 0%, rgba(20,17,12,.82) 42%, rgba(20,17,12,.55) 100%), linear-gradient(to right, rgba(20,17,12,.8), rgba(20,17,12,.15) 65%)"
+    style="background:linear-gradient(to right, rgba(20,17,12,.93) 0%, rgba(20,17,12,.68) 34%, rgba(20,17,12,.08) 62%), linear-gradient(to top, rgba(20,17,12,.5), transparent 42%)"
   >
   </div>
   <div class="container-page pt-24 pb-16 sm:pt-28 sm:pb-20 lg:pt-40 lg:pb-28 max-w-3xl">
@@ -56,7 +58,7 @@ const stats = [
         ? 'Konkrete Hilfe für die Ärmsten in den Slums Afrikas.'
         : 'Concrete help for the poorest people in the slums of Africa.'}
     </h1>
-    <p class="mt-6 text-lg sm:text-xl text-white/90 max-w-2xl">
+    <p class="mt-6 text-lg sm:text-xl text-white/90 max-w-xl [text-shadow:0_1px_12px_rgba(0,0,0,.55)]">
       {de
         ? 'Project Humanity e.V. bringt Nahrung, Kleidung, Schulmaterial und medizinische Versorgung dorthin, wo sie am dringendsten gebraucht werden – unabhängig von Religion oder Herkunft.'
         : 'Project Humanity e.V. brings food, clothing, school supplies and healthcare to where they are needed most — regardless of religion or origin.'}
