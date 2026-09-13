@@ -1,0 +1,4 @@
+name = "project-humanity"
+# nodejs_compat gives the SSR worker Buffer, node:crypto and – with a recent
+# compatibility date – process.env populated from the Worker's secrets/vars.
+compatibility_flags = ["nodejs_compat"]

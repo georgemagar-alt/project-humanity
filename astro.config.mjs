@@ -1,6 +1,6 @@
 // @ts-check
 import { defineConfig, fontProviders } from 'astro/config';
-import netlify from '@astrojs/netlify';
+import cloudflare from '@astrojs/cloudflare';
 import tailwindcss from '@tailwindcss/vite';
 
 // Content pages are static; only /api/* and /admin opt into on-demand rendering
@@ -10,7 +10,10 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   site: process.env.PUBLIC_SITE_URL || 'https://example.org',
   output: 'static',
-  adapter: netlify(),
+  adapter: cloudflare({
+    // Optimize images at build time (Workers has no sharp at runtime).
+    imageService: 'compile',
+  }),
   vite: {
     plugins: [tailwindcss()],
   },

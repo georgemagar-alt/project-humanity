@@ -1,5 +1,4 @@
 import type { APIRoute } from 'astro';
-import { timingSafeEqual } from 'node:crypto';
 import {
   adminCreateCampaign,
   adminListCampaigns,
@@ -14,18 +13,21 @@ export const prerender = false;
 
 const STATUSES: CampaignStatus[] = ['active', 'paused', 'completed', 'archived'];
 
+/** Constant-time string compare (runtime-agnostic; no node:crypto). */
+function safeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return mismatch === 0;
+}
+
 function authorized(request: Request): boolean {
-  const header = request.headers.get('authorization') ?? '';
-  const provided = header.replace(/^Bearer\s+/i, '');
-  let expected: string;
+  const provided = (request.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '');
   try {
-    expected = requireEnv('ADMIN_TOKEN');
+    return safeEqual(provided, requireEnv('ADMIN_TOKEN'));
   } catch {
     return false;
   }
-  const a = Buffer.from(provided);
-  const b = Buffer.from(expected);
-  return a.length === b.length && timingSafeEqual(a, b);
 }
 
 export const GET: APIRoute = async ({ request }) => {
