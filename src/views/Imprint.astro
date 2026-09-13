@@ -5,41 +5,72 @@ interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
+const de = lang === 'de';
 ---
 
 <div class="container-page py-16 lg:py-20">
-<article class="prose-page">
-  <h1 class="text-4xl sm:text-5xl font-bold mb-6">{lang === 'de' ? 'Impressum' : 'Imprint'}</h1>
+  <article class="prose-page">
+    <h1 class="text-4xl sm:text-5xl font-bold mb-6">{de ? 'Impressum' : 'Imprint'}</h1>
 
-  <p>
-    <strong>{lang === 'de' ? 'Platzhalter – bitte ausfüllen und rechtlich prüfen.' : 'Placeholder – fill in and have it checked legally.'}</strong>
-  </p>
+    <h2>{de ? 'Angaben gemäß § 5 DDG' : 'Information pursuant to § 5 DDG'}</h2>
+    <p>
+      Project Humanity e.&nbsp;V.<br />
+      Lang Str. 40<br />
+      63486 Bruchköbel<br />
+      {de ? 'Deutschland' : 'Germany'}
+    </p>
 
-  <p>
-    Project Humanity e.&nbsp;V.<br />
-    Musterstraße 12<br />
-    12345 Musterstadt
-  </p>
+    <h2>{de ? 'Vertretungsberechtigter Vorstand' : 'Board of directors'}</h2>
+    <p>
+      {de ? 'Vorstand im Sinne des § 26 BGB:' : 'Board pursuant to § 26 BGB:'}<br />
+      Ephraim Eldali ({de ? 'Vorsitzender' : 'Chairman'})<br />
+      Dolage Philips ({de ? 'stellv. Vorsitzende' : 'Deputy Chairwoman'})<br />
+      George Magar ({de ? 'Kassenwart' : 'Treasurer'})<br />
+      Selvia Magar ({de ? 'Protokollantin' : 'Secretary'})
+    </p>
 
-  <p>
-    {lang === 'de' ? 'Vertreten durch den Vorstand:' : 'Represented by the board:'}<br />
-    Vorname Nachname, Vorname Nachname
-  </p>
+    <h2>{de ? 'Registereintrag' : 'Register entry'}</h2>
+    <p>
+      {de ? 'Eingetragen im Vereinsregister.' : 'Registered in the register of associations.'}<br />
+      {de ? 'Registergericht' : 'Register court'}: {de ? 'Amtsgericht Hanau' : 'Local Court of Hanau'}<br />
+      {de ? 'Registernummer' : 'Register number'}: VR 32120
+    </p>
 
-  <p>
-    {lang === 'de' ? 'Registergericht:' : 'Register court:'} Amtsgericht Musterstadt,
-    {lang === 'de' ? ' Registernummer:' : ' register number:'} VR 12345
-  </p>
+    <h2>{de ? 'Kontakt' : 'Contact'}</h2>
+    <p>
+      {de ? 'E-Mail' : 'Email'}:
+      <a href="mailto:info@project-humanity.org">info@project-humanity.org</a>
+    </p>
 
-  <p>
-    {lang === 'de' ? 'Kontakt:' : 'Contact:'}
-    <a href="mailto:info@your-domain.org">info@your-domain.org</a>
-  </p>
+    <h2>{de ? 'Redaktionell verantwortlich' : 'Responsible for content'}</h2>
+    <p>
+      {de
+        ? 'Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:'
+        : 'Responsible for content pursuant to § 18 (2) MStV:'}<br />
+      George Magar<br />
+      Erich-Kästner-Straße 102c<br />
+      63329 Egelsbach
+    </p>
 
-  <p>
-    {lang === 'de'
-      ? 'Inhaltlich verantwortlich gemäß § 18 Abs. 2 MStV: Vorname Nachname, Anschrift wie oben.'
-      : 'Responsible for content under § 18 (2) MStV: First Last, address as above.'}
-  </p>
-</article>
+    <h2>{de ? 'Verbraucherstreitbeilegung' : 'Consumer dispute resolution'}</h2>
+    <p>
+      {de
+        ? 'Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.'
+        : 'We are neither willing nor obliged to participate in dispute resolution proceedings before a consumer arbitration board.'}
+    </p>
+
+    <h2>{de ? 'Haftung für Inhalte' : 'Liability for content'}</h2>
+    <p>
+      {de
+        ? 'Als Diensteanbieter sind wir für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Wir sind jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen. Bei Bekanntwerden von Rechtsverletzungen entfernen wir die betreffenden Inhalte umgehend.'
+        : 'As a service provider, we are responsible for our own content on these pages in accordance with general law. We are, however, not obliged to monitor transmitted or stored third-party information. Upon becoming aware of any legal violations, we will remove the content in question immediately.'}
+    </p>
+
+    <h2>{de ? 'Haftung für Links' : 'Liability for links'}</h2>
+    <p>
+      {de
+        ? 'Unser Angebot enthält ggf. Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Für diese fremden Inhalte ist stets der jeweilige Anbieter verantwortlich. Bei Bekanntwerden von Rechtsverletzungen entfernen wir derartige Links umgehend.'
+        : 'Our offer may contain links to external third-party websites over whose content we have no influence. The respective provider is always responsible for such external content. Upon becoming aware of any legal violations, we will remove such links immediately.'}
+    </p>
+  </article>
 </div>

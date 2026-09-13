@@ -5,60 +5,164 @@ interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
-const de = lang === 'de';
+
+type Section = { h: string; p: string[] };
+type Copy = { title: string; sections: Section[] };
+
+const copy: Record<Lang, Copy> = {
+  de: {
+    title: 'Datenschutzerklärung',
+    sections: [
+      {
+        h: 'Verantwortliche Stelle',
+        p: [
+          'Verantwortlich für die Datenverarbeitung auf dieser Website ist:',
+          'Project Humanity e.V., Lang Str. 40, 63486 Bruchköbel, Deutschland, vertreten durch den Vorstand (Vorsitzender: Ephraim Eldali). E-Mail: info@project-humanity.org.',
+        ],
+      },
+      {
+        h: 'Deine Rechte',
+        p: [
+          'Du hast jederzeit das Recht auf Auskunft über die zu deiner Person gespeicherten Daten (Art. 15 DSGVO), auf Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20) sowie ein Widerspruchsrecht (Art. 21). Wende dich dazu formlos an info@project-humanity.org.',
+          'Außerdem hast du das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren. Zuständig ist der Hessische Beauftragte für Datenschutz und Informationsfreiheit.',
+        ],
+      },
+      {
+        h: 'Hosting',
+        p: [
+          'Diese Website wird bei Netlify (Netlify, Inc., USA) gehostet. Beim Aufruf der Seiten verarbeitet Netlify technisch notwendige Server-Logdaten (u. a. IP-Adresse, Datum und Uhrzeit des Zugriffs, aufgerufene Seite, übertragene Datenmenge, Browsertyp). Dies dient dem sicheren und stabilen Betrieb der Website. Rechtsgrundlage ist unser berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO). Bei der Übermittlung in die USA stützen wir uns auf die EU-Standardvertragsklauseln.',
+        ],
+      },
+      {
+        h: 'Verschlüsselung (SSL/TLS)',
+        p: [
+          'Diese Seite nutzt aus Sicherheitsgründen eine SSL-/TLS-Verschlüsselung. Eine verschlüsselte Verbindung erkennst du an „https://“ in der Adresszeile deines Browsers.',
+        ],
+      },
+      {
+        h: 'Datenbank',
+        p: [
+          'Spenden- und Mitgliedsdaten werden in einer Datenbank des Anbieters Turso gespeichert, die in einem Rechenzentrum innerhalb der EU (Irland, Amazon Web Services) betrieben wird.',
+        ],
+      },
+      {
+        h: 'Spenden über PayPal',
+        p: [
+          'Für Spenden nutzen wir PayPal (PayPal (Europe) S.à r.l. et Cie, S.C.A., Luxemburg). Vor der Zahlung erheben wir die von dir eingegebenen Spenderdaten (Anrede, Titel, Vor- und Nachname, ggf. Unternehmen, E-Mail-Adresse, ggf. Telefonnummer, Anschrift) sowie den Spendenbetrag und die gewählte Kampagne. Diese Daten verarbeiten und speichern wir zur Abwicklung der Spende, für die Bestätigungs-E-Mail und für eine spätere Zuwendungsbestätigung.',
+          'Wenn du den PayPal-Button anklickst, wird zusätzlich das PayPal-JavaScript geladen und es werden Zahlungsdaten an PayPal übermittelt; dabei kann eine Datenübermittlung in Drittländer erfolgen. Rechtsgrundlage ist die Vertrags- bzw. Spendenabwicklung (Art. 6 Abs. 1 lit. b DSGVO) sowie unser berechtigtes Interesse (lit. f). Spendendatensätze bewahren wir aus steuer- und handelsrechtlichen Gründen bis zu 10 Jahre auf.',
+        ],
+      },
+      {
+        h: 'E-Mail-Versand',
+        p: [
+          'Bestätigungs- und Benachrichtigungs-E-Mails (z. B. die Danke-Mail nach einer Spende oder die Eingangsbestätigung einer Mitgliedsanfrage) versenden wir über den Dienstleister Brevo (Sendinblue GmbH / Brevo, EU). Dabei werden Name und E-Mail-Adresse verarbeitet.',
+        ],
+      },
+      {
+        h: 'Kontakt und „Mitglied werden“',
+        p: [
+          'Wenn du uns über das Formular „Mitglied werden“ oder per E-Mail kontaktierst, verarbeiten wir die von dir angegebenen Daten (Name, E-Mail-Adresse, ggf. Telefonnummer und Nachricht) ausschließlich zur Bearbeitung deiner Anfrage. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b bzw. lit. f DSGVO. Die Daten löschen wir, sobald sie für den Zweck nicht mehr erforderlich sind und keine gesetzlichen Aufbewahrungspflichten entgegenstehen.',
+        ],
+      },
+      {
+        h: 'Cookies und Tracking',
+        p: [
+          'Diese Website setzt keine Analyse- oder Tracking-Cookies und bindet keine externen Analysedienste ein. Schriftarten werden lokal von unserem Server ausgeliefert; es besteht dabei keine Verbindung zu Servern Dritter. Ein Cookie-Banner ist deshalb nicht erforderlich.',
+        ],
+      },
+      {
+        h: 'Änderung dieser Datenschutzerklärung',
+        p: [
+          'Wir passen diese Datenschutzerklärung an, sobald Änderungen an der Website oder an den eingesetzten Diensten dies erforderlich machen.',
+        ],
+      },
+    ],
+  },
+  en: {
+    title: 'Privacy Policy',
+    sections: [
+      {
+        h: 'Controller',
+        p: [
+          'The controller responsible for data processing on this website is:',
+          'Project Humanity e.V., Lang Str. 40, 63486 Bruchköbel, Germany, represented by its board (chairman: Ephraim Eldali). Email: info@project-humanity.org.',
+        ],
+      },
+      {
+        h: 'Your rights',
+        p: [
+          'You have the right at any time to access the data stored about you (Art. 15 GDPR), to rectification (Art. 16), erasure (Art. 17), restriction of processing (Art. 18), data portability (Art. 20) and to object (Art. 21). To exercise these rights, contact info@project-humanity.org.',
+          'You also have the right to lodge a complaint with a data protection supervisory authority (in our case the Hessian Commissioner for Data Protection and Freedom of Information).',
+        ],
+      },
+      {
+        h: 'Hosting',
+        p: [
+          'This website is hosted by Netlify, Inc. (USA). When the pages are accessed, Netlify processes technically necessary server log data (IP address, date and time, page requested, amount of data transferred, browser type) for the secure and stable operation of the website. The legal basis is our legitimate interest (Art. 6(1)(f) GDPR). For transfers to the USA we rely on the EU standard contractual clauses.',
+        ],
+      },
+      {
+        h: 'Encryption (SSL/TLS)',
+        p: [
+          'For security reasons this site uses SSL/TLS encryption. You can recognise an encrypted connection by “https://” in your browser’s address bar.',
+        ],
+      },
+      {
+        h: 'Database',
+        p: [
+          'Donation and membership data is stored in a database provided by Turso, operated in a data centre within the EU (Ireland, Amazon Web Services).',
+        ],
+      },
+      {
+        h: 'Donations via PayPal',
+        p: [
+          'For donations we use PayPal (PayPal (Europe) S.à r.l. et Cie, S.C.A., Luxembourg). Before payment we collect the donor details you enter (salutation, title, first and last name, optional company, email address, optional phone number, postal address) as well as the amount and the chosen campaign. We process and store this data to handle the donation, for the confirmation email and for a later donation receipt.',
+          'When you click the PayPal button, PayPal JavaScript is additionally loaded and payment data is transmitted to PayPal, which may involve a transfer to third countries. The legal basis is the performance of the donation (Art. 6(1)(b) GDPR) and our legitimate interest (lit. f). Donation records are kept for up to 10 years for tax and commercial-law reasons.',
+        ],
+      },
+      {
+        h: 'Email delivery',
+        p: [
+          'Confirmation and notification emails (e.g. the thank-you email after a donation or the acknowledgement of a membership request) are sent via the provider Brevo (EU). Name and email address are processed for this purpose.',
+        ],
+      },
+      {
+        h: 'Contact and “Become a member”',
+        p: [
+          'If you contact us via the “Become a member” form or by email, we process the data you provide (name, email address, optional phone number and message) solely to handle your request. The legal basis is Art. 6(1)(b) or (f) GDPR. We delete the data as soon as it is no longer required and no statutory retention obligations apply.',
+        ],
+      },
+      {
+        h: 'Cookies and tracking',
+        p: [
+          'This website sets no analytics or tracking cookies and does not embed any external analytics services. Fonts are served locally from our own server, with no connection to third-party servers. A cookie banner is therefore not required.',
+        ],
+      },
+      {
+        h: 'Changes to this privacy policy',
+        p: [
+          'We update this privacy policy whenever changes to the website or the services used make it necessary.',
+        ],
+      },
+    ],
+  },
+};
+
+const c = copy[lang];
 ---
 
 <div class="container-page py-16 lg:py-20">
-<article class="prose-page">
-  <h1 class="text-4xl sm:text-5xl font-bold mb-6">{de ? 'Datenschutzerklärung' : 'Privacy Policy'}</h1>
-
-  <p>
-    <strong>{de ? 'Platzhalter – bitte an eure tatsächlichen Verhältnisse anpassen und rechtlich prüfen lassen.' : 'Placeholder – adapt to your actual setup and have it reviewed legally.'}</strong>
-  </p>
-
-  <h2>{de ? 'Verantwortlicher' : 'Controller'}</h2>
-  <p>Project Humanity e.&nbsp;V., Anschrift siehe Impressum.</p>
-
-  <h2>{de ? 'Hosting' : 'Hosting'}</h2>
-  <p>
-    {de
-      ? 'Diese Website wird bei Netlify (Netlify, Inc., USA) gehostet. Beim Aufruf werden technisch notwendige Server-Logdaten (u. a. IP-Adresse, Zeitpunkt, aufgerufene Seite) verarbeitet. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO.'
-      : 'This website is hosted by Netlify, Inc. (USA). Technically necessary server log data (IP address, timestamp, page requested) is processed on access. Legal basis: Art. 6(1)(f) GDPR.'}
-  </p>
-
-  <h2>{de ? 'Spenden über PayPal' : 'Donations via PayPal'}</h2>
-  <p>
-    {de
-      ? 'Für Spenden nutzen wir PayPal (PayPal (Europe) S.à r.l. et Cie, S.C.A., Luxemburg). Vor der Zahlung erheben wir die von dir eingegebenen Spenderdaten (Anrede, Titel, Vor- und Nachname, ggf. Unternehmen, E-Mail-Adresse, ggf. Telefonnummer, Anschrift) sowie den Spendenbetrag und die gewählte Kampagne. Diese Daten verarbeiten und speichern wir zur Abwicklung der Spende, für die Bestätigungs-E-Mail und für eine spätere Zuwendungsbestätigung (Spendenquittung). Wenn du den PayPal-Button anklickst, wird zusätzlich das PayPal-JavaScript geladen und es werden Zahlungsdaten an PayPal übermittelt. Rechtsgrundlage: Art. 6 Abs. 1 lit. b und lit. f DSGVO. Spendendatensätze bewahren wir aus steuerlichen Gründen bis zu 10 Jahre auf.'
-      : 'For donations we use PayPal (PayPal (Europe) S.à r.l. et Cie, S.C.A., Luxembourg). Before payment we collect the donor details you enter (salutation, title, first and last name, optional company, email address, optional phone number, postal address) as well as the amount and the chosen campaign. We process and store this data to handle the donation, for the confirmation email and for a later donation receipt. When you click the PayPal button, PayPal JavaScript is additionally loaded and payment data is transmitted to PayPal. Legal basis: Art. 6(1)(b) and (f) GDPR. Donation records are kept for up to 10 years for tax reasons.'}
-  </p>
-
-  <h2>{de ? 'E-Mail-Versand' : 'Email delivery'}</h2>
-  <p>
-    {de
-      ? 'Die Dankes- und Benachrichtigungs-E-Mails versenden wir über Brevo (Sendinblue GmbH / Brevo, EU). Dabei werden Name und E-Mail-Adresse verarbeitet.'
-      : 'Thank-you and notification emails are sent via Brevo (EU). Name and email address are processed for this.'}
-  </p>
-
-  <h2>{de ? 'Formular „Mitglied werden“' : '"Become a member" form'}</h2>
-  <p>
-    {de
-      ? 'Die im Formular eingegebenen Daten (Name, E-Mail, ggf. Telefon und Nachricht) verarbeiten wir ausschließlich zur Bearbeitung deiner Anfrage. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.'
-      : 'The data you enter (name, email, optionally phone and message) is processed solely to handle your request. Legal basis: Art. 6(1)(b) GDPR.'}
-  </p>
-
-  <h2>{de ? 'Deine Rechte' : 'Your rights'}</h2>
-  <p>
-    {de
-      ? 'Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch sowie ein Beschwerderecht bei einer Aufsichtsbehörde.'
-      : 'You have the right to access, rectification, erasure, restriction, data portability and objection, as well as the right to lodge a complaint with a supervisory authority.'}
-  </p>
-
-  <h2>{de ? 'Cookies / Tracking' : 'Cookies / tracking'}</h2>
-  <p>
-    {de
-      ? 'Diese Website setzt keine Analyse- oder Tracking-Cookies. Schriftarten werden lokal ausgeliefert.'
-      : 'This website sets no analytics or tracking cookies. Fonts are served locally.'}
-  </p>
-</article>
+  <article class="prose-page">
+    <h1 class="text-4xl sm:text-5xl font-bold mb-6">{c.title}</h1>
+    {
+      c.sections.map((s) => (
+        <section>
+          <h2>{s.h}</h2>
+          {s.p.map((para) => (
+            <p>{para}</p>
+          ))}
+        </section>
+      ))
+    }
+  </article>
 </div>

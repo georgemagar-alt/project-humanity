@@ -1,5 +1,5 @@
 ---
-import { type Lang } from '../i18n/ui';
+import { localizePath, type Lang } from '../i18n/ui';
 
 interface Props {
   lang: Lang;
@@ -12,20 +12,47 @@ const de = lang === 'de';
   <article class="prose-page">
     <p class="eyebrow">{de ? 'Kontakt' : 'Contact'}</p>
     <h1 class="text-4xl sm:text-5xl font-bold mb-6">{de ? 'Kontakt' : 'Contact'}</h1>
-    {
-      de ? (
-        <>
-          <p><strong>Platzhalter.</strong> E-Mail-Adresse, ggf. Postanschrift und Telefonzeiten.</p>
-          <p>E-Mail: <a href="mailto:info@your-domain.org">info@your-domain.org</a></p>
-          <p>Für Mitgliedschaftsanfragen nutze bitte das Formular unter „Mitglied werden“.</p>
-        </>
-      ) : (
-        <>
-          <p><strong>Placeholder.</strong> Email address, postal address if any, phone hours.</p>
-          <p>Email: <a href="mailto:info@your-domain.org">info@your-domain.org</a></p>
-          <p>For membership requests, please use the form under "Become a member".</p>
-        </>
-      )
-    }
+
+    <p>
+      {de
+        ? 'Du hast eine Frage, möchtest mithelfen oder mehr über unsere Projekte erfahren? Wir freuen uns über deine Nachricht.'
+        : 'Do you have a question, would you like to help, or learn more about our projects? We look forward to hearing from you.'}
+    </p>
+
+    <h2>{de ? 'Verein' : 'Association'}</h2>
+    <p>
+      Project Humanity e.&nbsp;V.<br />
+      Lang Str. 40<br />
+      63486 Bruchköbel<br />
+      {de ? 'Deutschland' : 'Germany'}
+    </p>
+    <p>
+      {de ? 'E-Mail' : 'Email'}:
+      <a href="mailto:info@project-humanity.org">info@project-humanity.org</a>
+    </p>
+
+    <h2>{de ? 'Mitglied werden' : 'Become a member'}</h2>
+    <p>
+      {de ? 'Für Mitgliedschaftsanfragen nutze bitte unser ' : 'For membership requests, please use our '}
+      <a href={localizePath('/mitglied-werden', lang)}>{de ? 'Formular „Mitglied werden“' : '“Become a member” form'}</a>.
+    </p>
+
+    <h2>{de ? 'Spendenkonto' : 'Donation account'}</h2>
+    <p>
+      {de
+        ? 'Du kannst auch per Überweisung spenden:'
+        : 'You can also donate by bank transfer:'}
+    </p>
+    <p>
+      {de ? 'Kontoinhaber' : 'Account holder'}: Project Humanity e.&nbsp;V.<br />
+      {de ? 'Bank' : 'Bank'}: Commerzbank<br />
+      IBAN: DE91 5064 0015 0237 1045 00<br />
+      BIC: COBADEFFXXX
+    </p>
+    <p class="text-sm text-muted">
+      {de
+        ? 'Bitte gib im Verwendungszweck die Kampagne an, die du unterstützen möchtest (z. B. „Winterhilfe 2026“).'
+        : 'Please state the campaign you would like to support in the payment reference (e.g. “Winter Relief 2026”).'}
+    </p>
   </article>
 </div>
