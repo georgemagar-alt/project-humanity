@@ -2,3 +2,8 @@ name = "project-humanity"
 # nodejs_compat gives the SSR worker Buffer, node:crypto and – with a recent
 # compatibility date – process.env populated from the Worker's secrets/vars.
 compatibility_flags = ["nodejs_compat"]
+
+# KV namespace backing Astro sessions (the Cloudflare adapter binds "SESSION").
+[[kv_namespaces]]
+binding = "SESSION"
+id = "6a1c1e31452a4e02b4a606d727d60421"
