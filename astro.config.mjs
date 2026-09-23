@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig, fontProviders } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
+import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
 // Content pages are static; only /api/* and /admin opt into on-demand rendering
@@ -8,12 +9,15 @@ import tailwindcss from '@tailwindcss/vite';
 // Fonts are downloaded at build time and self-hosted from our own domain —
 // the visitor's browser never contacts Google.
 export default defineConfig({
-  site: process.env.PUBLIC_SITE_URL || 'https://example.org',
+  site: process.env.PUBLIC_SITE_URL || 'https://project-humanity.org',
   output: 'static',
   adapter: cloudflare({
     // Optimize images at build time (Workers has no sharp at runtime).
     imageService: 'compile',
   }),
+  // Generates sitemap-index.xml + sitemap-0.xml for search engines.
+  // /admin and /api are excluded (admin is noindex, api are not pages).
+  integrations: [sitemap({ filter: (page) => !page.includes('/admin') })],
   vite: {
     plugins: [tailwindcss()],
   },

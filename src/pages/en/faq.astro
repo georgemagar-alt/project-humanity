@@ -1,0 +1,13 @@
+---
+import Base from '../../layouts/BaseLayout.astro';
+import Faq from '../../views/Faq.astro';
+const lang = 'en' as const;
+---
+
+<Base
+  lang={lang}
+  title="Frequently asked questions"
+  description="Answers to common questions about Project Humanity e.V.: donating, tax deductibility, non-profit status and membership."
+>
+  <Faq lang={lang} />
+</Base>

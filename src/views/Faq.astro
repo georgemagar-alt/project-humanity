@@ -1,0 +1,169 @@
+---
+import { localizePath, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const de = lang === 'de';
+
+// Localised internal links used inside the answers.
+const dp = localizePath('/spenden', lang);
+const jp = localizePath('/mitglied-werden', lang);
+const cp = localizePath('/kontakt', lang);
+const ip = localizePath('/impressum', lang);
+const np = localizePath('/aktuelles', lang);
+const wp = localizePath('/was-wir-tun', lang);
+const mail = 'info@project-humanity.org';
+
+type QA = { q: string; a: string };
+
+const copy: Record<Lang, { title: string; intro: string; items: QA[] }> = {
+  de: {
+    title: 'Häufige Fragen',
+    intro:
+      'Antworten auf die häufigsten Fragen rund um Project Humanity e.V., Spenden und Mitgliedschaft. Fehlt etwas? Schreib uns gern.',
+    items: [
+      {
+        q: 'Was macht Project Humanity e.V.?',
+        a: 'Project Humanity e.V. ist ein gemeinnütziger, ehrenamtlich getragener Verein. Wir bringen den ärmsten Menschen in den Slums Afrikas Nahrung, Kleidung, Schulmaterial und medizinische Versorgung – unabhängig von Religion oder Herkunft.',
+      },
+      {
+        q: 'Wo helft ihr konkret?',
+        a: `Unser Schwerpunkt liegt derzeit auf dem <strong>Sudan</strong> – aktuell die größte humanitäre Krise der Welt – sowie weiteren Regionen in Afrika. Mehr dazu unter <a href="${wp}">Was wir tun</a>.`,
+      },
+      {
+        q: 'Wie kann ich spenden?',
+        a: `Am einfachsten online über unsere <a href="${dp}">Spendenseite</a> per PayPal – der Spendenstand aktualisiert sich sofort. Alternativ per Überweisung: Commerzbank, IBAN DE91 5064 0015 0237 1045 00, BIC COBADEFFXXX, Empfänger: Project Humanity e.V.`,
+      },
+      {
+        q: 'Kann ich für ein bestimmtes Projekt spenden?',
+        a: `Ja. Auf der <a href="${dp}">Spendenseite</a> kannst du eine konkrete Kampagne auswählen; der Spendenstand wird dort live angezeigt.`,
+      },
+      {
+        // REVIEW: Bitte bestätigen/erklären, wie Verwaltungskosten gedeckt werden,
+        // damit die "100 %"-Aussage glaubwürdig belegt ist.
+        q: 'Wie viel meiner Spende kommt an?',
+        a: 'Wir arbeiten ausschließlich ehrenamtlich und projektbezogen, damit möglichst 100 % deiner Spende direkt in die Hilfsprojekte fließen.',
+      },
+      {
+        // REVIEW: Bitte bestätigen, dass ihr Zuwendungsbestätigungen ausstellt.
+        q: 'Ist meine Spende steuerlich absetzbar?',
+        a: `Als gemeinnütziger Verein sind Spenden an uns grundsätzlich steuerlich absetzbar. Die automatische Bestätigungs-E-Mail nach deiner Spende ist noch keine Zuwendungsbestätigung im steuerlichen Sinne – für eine Zuwendungsbestätigung schreib uns bitte an <a href="mailto:${mail}">${mail}</a>.`,
+      },
+      {
+        q: 'Ist Project Humanity gemeinnützig?',
+        a: `Ja. Project Humanity e.V. ist ein eingetragener gemeinnütziger Verein (Vereinsregister VR 32120). Die vollständigen Angaben findest du im <a href="${ip}">Impressum</a>.`,
+      },
+      {
+        q: 'Wie erfahre ich, was mit den Spenden passiert?',
+        a: `Über aktuelle Projekte und Fortschritte berichten wir unter <a href="${np}">Aktuelles</a>.`,
+      },
+      {
+        q: 'Kann ich Mitglied werden oder ehrenamtlich helfen?',
+        a: `Sehr gern. Über <a href="${jp}">Mitglied werden</a> kannst du eine unverbindliche Anfrage stellen – mit Beitrag, Zeit oder beidem.`,
+      },
+      {
+        q: 'Wie kann ich euch erreichen?',
+        a: `Schreib uns jederzeit an <a href="mailto:${mail}">${mail}</a> oder über die <a href="${cp}">Kontaktseite</a>.`,
+      },
+    ],
+  },
+  en: {
+    title: 'Frequently asked questions',
+    intro:
+      'Answers to the most common questions about Project Humanity e.V., donating and membership. Missing something? Feel free to reach out.',
+    items: [
+      {
+        q: 'What does Project Humanity e.V. do?',
+        a: 'Project Humanity e.V. is a non-profit, volunteer-run association. We bring food, clothing, school supplies and healthcare to the poorest people in the slums of Africa — regardless of religion or origin.',
+      },
+      {
+        q: 'Where exactly do you help?',
+        a: `Our current focus is <strong>Sudan</strong> — today the largest humanitarian crisis in the world — as well as other regions in Africa. Learn more under <a href="${wp}">What we do</a>.`,
+      },
+      {
+        q: 'How can I donate?',
+        a: `The easiest way is online via our <a href="${dp}">donation page</a> using PayPal — the total updates instantly. You can also give by bank transfer: Commerzbank, IBAN DE91 5064 0015 0237 1045 00, BIC COBADEFFXXX, recipient: Project Humanity e.V.`,
+      },
+      {
+        q: 'Can I donate to a specific project?',
+        a: `Yes. On the <a href="${dp}">donation page</a> you can choose a specific campaign; the running total is shown live.`,
+      },
+      {
+        q: 'How much of my donation actually arrives?',
+        a: 'We work entirely on a voluntary, project-based basis so that as close to 100% of your donation as possible goes directly into the aid projects.',
+      },
+      {
+        q: 'Is my donation tax-deductible?',
+        a: `As a non-profit association, donations to us are generally tax-deductible. The automatic confirmation email after your donation is not yet a tax receipt (Zuwendungsbestätigung) — for one, please write to us at <a href="mailto:${mail}">${mail}</a>.`,
+      },
+      {
+        q: 'Is Project Humanity a registered non-profit?',
+        a: `Yes. Project Humanity e.V. is a registered non-profit association (register of associations VR 32120). Full details are in our <a href="${ip}">imprint</a>.`,
+      },
+      {
+        q: 'How do I find out what happens with the donations?',
+        a: `We report on current projects and progress under <a href="${np}">News</a>.`,
+      },
+      {
+        q: 'Can I become a member or volunteer?',
+        a: `We’d love that. Via <a href="${jp}">Become a member</a> you can send a no-obligation enquiry — with a contribution, your time, or both.`,
+      },
+      {
+        q: 'How can I reach you?',
+        a: `Write to us any time at <a href="mailto:${mail}">${mail}</a> or via our <a href="${cp}">contact page</a>.`,
+      },
+    ],
+  },
+};
+
+const c = copy[lang];
+
+// FAQPage structured data — answer text is the plain-text version (tags stripped)
+// so it matches the visible text, as Google requires.
+const stripTags = (s: string) => s.replace(/<[^>]+>/g, '');
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: c.items.map((it) => ({
+    '@type': 'Question',
+    name: it.q,
+    acceptedAnswer: { '@type': 'Answer', text: stripTags(it.a) },
+  })),
+};
+---
+
+<script type="application/ld+json" is:inline set:html={JSON.stringify(faqLd)} />
+
+<div class="container-page py-16 lg:py-20">
+  <div class="max-w-3xl">
+    <p class="eyebrow">{de ? 'Gut zu wissen' : 'Good to know'}</p>
+    <h1 class="text-4xl sm:text-5xl font-bold mb-5">{c.title}</h1>
+    <p class="text-lg text-muted">{c.intro}</p>
+
+    <div class="mt-10 divide-y divide-line border-y border-line">
+      {
+        c.items.map((it) => (
+          <details class="group py-2">
+            <summary class="flex cursor-pointer items-center justify-between gap-4 py-3 font-display text-lg font-bold list-none [&::-webkit-details-marker]:hidden">
+              <span>{it.q}</span>
+              <span aria-hidden="true" class="shrink-0 text-gold-700 transition-transform group-open:rotate-45">+</span>
+            </summary>
+            <div
+              class="pb-4 -mt-1 text-muted leading-relaxed [&_a]:font-medium [&_a]:text-gold-700 [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:text-gold-800"
+              set:html={it.a}
+            />
+          </details>
+        ))
+      }
+    </div>
+
+    <p class="mt-10 text-muted">
+      {de ? 'Noch Fragen? ' : 'Still have questions? '}
+      <a href={cp} class="font-semibold underline decoration-gold underline-offset-4 hover:text-gold-700">
+        {de ? 'Schreib uns.' : 'Get in touch.'}
+      </a>
+    </p>
+  </div>
+</div>

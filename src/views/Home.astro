@@ -4,9 +4,9 @@ import { useTranslations, localizePath, type Lang } from '../i18n/ui';
 import { getPublicCampaigns, type CampaignPublic } from '../lib/db';
 import { formatCents } from '../lib/money';
 import CampaignList from '../components/CampaignList.astro';
-import heroImg from '../assets/images/hero.jpg';
-import motherChild from '../assets/images/mother-child.jpg';
-import sudanSlums from '../assets/images/sudan-slums.jpg';
+import heroImg from '../assets/images/familie-vor-lehmhaus.jpg';
+import motherChild from '../assets/images/mutter-mit-kind.jpg';
+import sudanSlums from '../assets/images/slums-im-sudan.jpg';
 
 interface Props {
   lang: Lang;
@@ -38,7 +38,9 @@ const stats = [
        side stays bright and joyful. -->
   <Image
     src={heroImg}
-    alt=""
+    alt={de
+      ? 'Eine Familie mit mehreren Kindern steht vor ihrem Lehmhaus in einem Slum.'
+      : 'A family with several children standing in front of their mud-brick home in a slum.'}
     widths={[640, 960, 1280, 1920, 2600]}
     sizes="100vw"
     loading="eager"
@@ -72,13 +74,35 @@ const stats = [
 
 <!-- Stat band -->
 <section class="bg-gold text-ink">
-  <div class="container-page py-12 grid gap-8 sm:grid-cols-3 text-center sm:text-left">
-    {stats.map((s) => (
-      <div>
-        <div class="font-display text-4xl sm:text-5xl font-bold leading-none">{s.value}</div>
-        <p class="mt-2 text-sm font-medium text-ink/80">{s.label}</p>
-      </div>
-    ))}
+  <div class="container-page py-12">
+    <div class="grid gap-8 sm:grid-cols-3 text-center sm:text-left">
+      {stats.map((s) => (
+        <div>
+          <div class="font-display text-4xl sm:text-5xl font-bold leading-none">{s.value}</div>
+          <p class="mt-2 text-sm font-medium text-ink/80">{s.label}</p>
+        </div>
+      ))}
+    </div>
+    <p class="mt-8 text-xs text-ink/70 text-center sm:text-left">
+      {de ? 'Quellen: ' : 'Sources: '}
+      <a
+        href="https://www.unocha.org/publications/report/sudan/sudan-humanitarian-needs-and-response-plan-2026-summary"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="underline hover:text-ink"
+      >
+        UN OCHA (2026)
+      </a>
+      {' · '}
+      <a
+        href="https://www.unhcr.org/emergencies/sudan-emergency"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="underline hover:text-ink"
+      >
+        UNHCR
+      </a>
+    </p>
   </div>
 </section>
 
@@ -138,7 +162,9 @@ const stats = [
 <section class="relative isolate overflow-clip bg-ink text-white">
   <Image
     src={sudanSlums}
-    alt=""
+    alt={de
+      ? 'Einfache Lehmhäuser in einer Slum-Siedlung im Sudan.'
+      : 'Simple mud-brick homes in a slum settlement in Sudan.'}
     widths={[640, 960, 1280, 1920, 2448]}
     sizes="100vw"
     class="absolute inset-0 -z-20 h-full w-full object-cover object-[50%_60%]"

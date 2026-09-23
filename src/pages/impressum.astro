@@ -4,6 +4,10 @@ import Imprint from '../views/Imprint.astro';
 const lang = 'de' as const;
 ---
 
-<Base lang={lang} title="Impressum">
+<Base
+  lang={lang}
+  title="Impressum"
+  description="Impressum von Project Humanity e.V. – Anschrift, vertretungsberechtigter Vorstand und rechtliche Angaben."
+>
   <Imprint lang={lang} />
 </Base>

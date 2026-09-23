@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import { type Lang } from '../i18n/ui';
-import girlImg from '../assets/images/girl.jpg';
+import girlImg from '../assets/images/maedchen-mit-halskreuz.jpg';
 
 interface Props {
   lang: Lang;
@@ -10,7 +10,7 @@ const { lang } = Astro.props;
 const de = lang === 'de';
 
 type Section = { id: string; heading: string; body: string[] };
-type Copy = { title: string; intro?: string; sections: Section[]; statutes: string };
+type Copy = { title: string; intro?: string; sections: Section[] };
 
 const copy: Record<Lang, Copy> = {
   en: {
@@ -43,7 +43,6 @@ const copy: Record<Lang, Copy> = {
         ],
       },
     ],
-    statutes: 'Statutes as PDF',
   },
   de: {
     title: 'Wer wir sind',
@@ -75,7 +74,6 @@ const copy: Record<Lang, Copy> = {
         ],
       },
     ],
-    statutes: 'Satzung als PDF',
   },
 };
 
@@ -110,16 +108,5 @@ const c = copy[lang];
         </section>
       ))
     }
-
-    <section>
-      <p>
-        <a href="/satzung.pdf">{c.statutes}</a>{' '}
-        <span class="text-muted text-sm">
-          ({lang === 'de'
-            ? 'Datei nach public/satzung.pdf legen'
-            : 'place the file at public/satzung.pdf'})
-        </span>
-      </p>
-    </section>
   </article>
 </div>

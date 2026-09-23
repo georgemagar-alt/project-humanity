@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/BaseLayout.astro';
+import Faq from '../views/Faq.astro';
+const lang = 'de' as const;
+---
+
+<Base
+  lang={lang}
+  title="Häufige Fragen"
+  description="Antworten auf häufige Fragen zu Project Humanity e.V.: Spenden, steuerliche Absetzbarkeit, Gemeinnützigkeit und Mitgliedschaft."
+>
+  <Faq lang={lang} />
+</Base>

@@ -16,11 +16,41 @@ const now = Date.now();
 const upcoming = all.filter((e) => (e.data.end ?? e.data.start).getTime() >= now);
 const past = all.filter((e) => (e.data.end ?? e.data.start).getTime() < now).reverse();
 
-const fmt = new Intl.DateTimeFormat(lang === 'de' ? 'de-DE' : 'en-GB', {
-  dateStyle: 'full',
-  timeStyle: 'short',
-});
+const loc = lang === 'de' ? 'de-DE' : 'en-GB';
+const fmt = new Intl.DateTimeFormat(loc, { dateStyle: 'full', timeStyle: 'short' });
+const fmtDate = new Intl.DateTimeFormat(loc, { dateStyle: 'full' });
+
+// Human-readable date/time: all-day events show the date (or date range) without
+// a time; timed events show the start date and time.
+const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
+const when = (ev: (typeof all)[number]) => {
+  if (ev.data.allDay) {
+    return ev.data.end && !sameDay(ev.data.start, ev.data.end)
+      ? fmtDate.formatRange(ev.data.start, ev.data.end)
+      : fmtDate.format(ev.data.start);
+  }
+  return fmt.format(ev.data.start);
+};
+
+const origin = Astro.site ?? new URL(Astro.url.origin);
+const isoDay = (d: Date) => d.toISOString().slice(0, 10);
+const eventsLd = all.map((ev) => ({
+  '@context': 'https://schema.org',
+  '@type': 'Event',
+  name: ev.data.title,
+  startDate: ev.data.allDay ? isoDay(ev.data.start) : ev.data.start.toISOString(),
+  ...(ev.data.end
+    ? { endDate: ev.data.allDay ? isoDay(ev.data.end) : ev.data.end.toISOString() }
+    : {}),
+  ...(ev.data.location ? { location: { '@type': 'Place', name: ev.data.location } } : {}),
+  ...(ev.data.summary ? { description: ev.data.summary } : {}),
+  organizer: { '@type': 'Organization', name: 'Project Humanity e.V.', url: origin.toString() },
+}));
 ---
+
+{eventsLd.length > 0 && (
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(eventsLd)} />
+)}
 
 <div class="container-page py-16 lg:py-20">
   <p class="eyebrow">{t('nav.events')}</p>
@@ -36,7 +66,7 @@ const fmt = new Intl.DateTimeFormat(lang === 'de' ? 'de-DE' : 'en-GB', {
           <li>
             <article class="card h-full p-6 border-l-4 border-l-gold">
               <time datetime={ev.data.start.toISOString()} class="text-sm font-semibold text-muted">
-                {fmt.format(ev.data.start)}
+                {when(ev)}
               </time>
               <h3 class="mt-1 font-display text-xl font-bold">{ev.data.title}</h3>
               {ev.data.location && <p class="mt-1 font-semibold">{ev.data.location}</p>}
@@ -57,7 +87,7 @@ const fmt = new Intl.DateTimeFormat(lang === 'de' ? 'de-DE' : 'en-GB', {
             <li>
               <article class="card h-full p-6 opacity-80">
                 <time datetime={ev.data.start.toISOString()} class="text-sm font-semibold text-muted">
-                  {fmt.format(ev.data.start)}
+                  {when(ev)}
                 </time>
                 <h3 class="mt-1 font-display text-lg font-bold">{ev.data.title}</h3>
                 {ev.data.location && <p class="mt-1 text-muted">{ev.data.location}</p>}

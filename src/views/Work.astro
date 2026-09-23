@@ -2,8 +2,8 @@
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import { localizePath, type Lang } from '../i18n/ui';
-import boyImg from '../assets/images/boy.jpg';
-import girlStrongImg from '../assets/images/girl-strong.jpg';
+import boyImg from '../assets/images/junge-vor-lehmhaus.jpg';
+import girlStrongImg from '../assets/images/maedchen-portrait.jpg';
 
 interface Props {
   lang: Lang;
@@ -22,7 +22,9 @@ const blockImages: Record<string, { src: ImageMetadata; alt: { de: string; en: s
   },
 };
 
-type Block = { id: string; heading: string; lead?: string; body: string[]; sources?: string };
+type SourceLink = { label: string; url: string };
+type Sources = { intro: string; links: SourceLink[] };
+type Block = { id: string; heading: string; lead?: string; body: string[]; sources?: Sources };
 type Copy = {
   title: string;
   intro: string;
@@ -30,6 +32,15 @@ type Copy = {
   whyAfrica: Block;
   /** One entry per country. Add another object here when a new country starts. */
   countries: Block[];
+};
+
+// Primary sources for the figures cited on this page (verified 2026).
+const SRC = {
+  ocha: 'https://www.unocha.org/publications/report/sudan/sudan-humanitarian-needs-and-response-plan-2026-summary',
+  unhcr: 'https://www.unhcr.org/emergencies/sudan-emergency',
+  ipc: 'https://www.ipcinfo.org/ipcinfo-website/countries-in-focus-archive/issue-151/en/',
+  undp: 'https://hdr.undp.org/',
+  imf: 'https://www.imf.org/en/Publications/WEO',
 };
 
 const copy: Record<Lang, Copy> = {
@@ -46,7 +57,13 @@ const copy: Record<Lang, Copy> = {
         "In the UN Development Programme's 2025 Human Development Index, 23 of Africa's 54 countries fall into the “low human development” category. But poverty is never only a number on an income chart: it shapes every part of a person's life, from whether their children eat and go to school to whether a treatable illness becomes fatal.",
         'Project Humanity e.V. works to change that — providing food, clothing, school supplies and healthcare to people in need, regardless of religion or tribe.',
       ],
-      sources: 'Figures: UNDP Human Development Report 2025; IMF World Economic Outlook 2024.',
+      sources: {
+        intro: 'Figures:',
+        links: [
+          { label: 'UNDP Human Development Report 2025', url: SRC.undp },
+          { label: 'IMF World Economic Outlook 2024', url: SRC.imf },
+        ],
+      },
     },
     countries: [
       {
@@ -58,8 +75,15 @@ const copy: Record<Lang, Copy> = {
           'Of Sudan’s roughly 51 million people, 33.7 million need humanitarian assistance in 2026 — more than in any other country, and about half of them children. Some 14 million people have been forced from their homes since April 2023: around 9 million remain displaced inside Sudan, the world’s largest internal displacement crisis, and about 4.4 million have fled to neighbouring countries. Roughly one in four Sudanese is now displaced.',
           'About 19.5 million people — two in every five — face acute food insecurity, and an estimated 4.2 million children are expected to suffer acute malnutrition this year, more than 825,000 of them severely. Project Humanity is committed to helping the people of Sudan meet these needs and rebuild their lives.',
         ],
-        sources:
-          'Figures: UN OCHA (Humanitarian Needs and Response Plan 2026), UNHCR, IPC (May 2026) and WFP/FAO/UNICEF, 2025–2026.',
+        sources: {
+          intro: 'Figures:',
+          links: [
+            { label: 'UN OCHA – Humanitarian Needs and Response Plan 2026', url: SRC.ocha },
+            { label: 'UNHCR – Sudan emergency', url: SRC.unhcr },
+            { label: 'IPC – Sudan (May 2026)', url: SRC.ipc },
+            { label: 'UNDP Human Development Report 2025', url: SRC.undp },
+          ],
+        },
       },
     ],
   },
@@ -76,7 +100,13 @@ const copy: Record<Lang, Copy> = {
         'Im Index der menschlichen Entwicklung 2025 des UN-Entwicklungsprogramms zählen 23 der 54 afrikanischen Länder zur Gruppe mit „niedriger menschlicher Entwicklung“. Doch Armut ist nie nur eine Zahl in einer Einkommensstatistik: Sie bestimmt jeden Bereich des Lebens – ob Kinder genug zu essen bekommen und zur Schule gehen und ob eine behandelbare Krankheit tödlich endet.',
         'Genau hier setzt Project Humanity e.V. an und bringt Menschen in Not Nahrung, Kleidung, Schulmaterial und medizinische Versorgung – unabhängig von Religion oder Volkszugehörigkeit.',
       ],
-      sources: 'Quellen: UNDP-Bericht über die menschliche Entwicklung 2025; IWF World Economic Outlook 2024.',
+      sources: {
+        intro: 'Quellen:',
+        links: [
+          { label: 'UNDP-Bericht über die menschliche Entwicklung 2025', url: SRC.undp },
+          { label: 'IWF World Economic Outlook 2024', url: SRC.imf },
+        ],
+      },
     },
     countries: [
       {
@@ -88,8 +118,15 @@ const copy: Record<Lang, Copy> = {
           'Von den rund 51 Millionen Einwohnern des Sudan sind 2026 33,7 Millionen auf humanitäre Hilfe angewiesen – mehr als in jedem anderen Land, etwa die Hälfte davon Kinder. Rund 14 Millionen Menschen wurden seit April 2023 aus ihren Häusern vertrieben: Etwa 9 Millionen sind innerhalb des Sudan auf der Flucht – die weltweit größte Binnenvertreibungskrise –, rund 4,4 Millionen sind in Nachbarländer geflohen. Etwa jede vierte Person im Sudan ist auf der Flucht.',
           'Rund 19,5 Millionen Menschen – zwei von fünf – haben nicht ausreichend zu essen, und schätzungsweise 4,2 Millionen Kinder werden in diesem Jahr an akuter Mangelernährung leiden, mehr als 825.000 davon schwer. Project Humanity setzt sich dafür ein, den Menschen im Sudan zu helfen, diese Not zu lindern und sich ein neues Leben aufzubauen.',
         ],
-        sources:
-          'Zahlen: UN OCHA (Humanitarian Needs and Response Plan 2026), UNHCR, IPC (Mai 2026) sowie WFP/FAO/UNICEF, 2025–2026.',
+        sources: {
+          intro: 'Zahlen:',
+          links: [
+            { label: 'UN OCHA – Humanitarian Needs and Response Plan 2026', url: SRC.ocha },
+            { label: 'UNHCR – Sudan-Nothilfe', url: SRC.unhcr },
+            { label: 'IPC – Sudan (Mai 2026)', url: SRC.ipc },
+            { label: 'UNDP-Bericht über die menschliche Entwicklung 2025', url: SRC.undp },
+          ],
+        },
       },
     ],
   },
@@ -131,7 +168,19 @@ const blocks: Block[] = [c.whyAfrica, ...c.countries];
           {block.body.map((p) => (
             <p>{p}</p>
           ))}
-          {block.sources && <p class="text-sm text-muted">{block.sources}</p>}
+          {block.sources && (
+            <p class="text-sm text-muted">
+              {block.sources.intro}{' '}
+              {block.sources.links.map((s, i) => (
+                <>
+                  {i > 0 && ' · '}
+                  <a href={s.url} target="_blank" rel="noopener noreferrer" class="underline hover:text-gold-700">
+                    {s.label}
+                  </a>
+                </>
+              ))}
+            </p>
+          )}
         </section>
       ))
     }

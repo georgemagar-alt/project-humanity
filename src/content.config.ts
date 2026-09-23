@@ -25,6 +25,8 @@ const events = defineCollection({
     translationKey: z.string(),
     start: z.coerce.date(),
     end: z.coerce.date().optional(),
+    // All-day / multi-day events: show the date(s) without a time.
+    allDay: z.boolean().default(false),
     location: z.string().default(''),
     summary: z.string().default(''),
     draft: z.boolean().default(false),

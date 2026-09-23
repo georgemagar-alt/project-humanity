@@ -3,14 +3,16 @@ import '../styles/global.css';
 import { Font } from 'astro:assets';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
-import { useTranslations, swapLangPath, type Lang } from '../i18n/ui';
+import { useTranslations, swapLangPath, localizePath, type Lang } from '../i18n/ui';
 
 interface Props {
   title: string;
   description?: string;
   lang: Lang;
+  /** Optional per-page social share image (absolute path from site root). */
+  image?: string;
 }
-const { title, description, lang } = Astro.props;
+const { title, description, lang, image } = Astro.props;
 const t = useTranslations(lang);
 const fullTitle = `${title} – ${t('site.name')}`;
 
@@ -18,6 +20,7 @@ const origin = Astro.site ?? new URL(Astro.url.origin);
 const canonical = new URL(Astro.url.pathname, origin).toString();
 const altDe = new URL(swapLangPath(Astro.url.pathname, 'de'), origin).toString();
 const altEn = new URL(swapLangPath(Astro.url.pathname, 'en'), origin).toString();
+const ogImage = new URL(image ?? '/og-image.jpg', origin).toString();
 
 const orgLd = {
   '@context': 'https://schema.org',
@@ -26,11 +29,59 @@ const orgLd = {
   alternateName: 'Project Humanity',
   url: origin.toString(),
   logo: new URL('/logo.svg', origin).toString(),
+  image: ogImage,
+  sameAs: [
+    'https://www.instagram.com/project_humanity_/',
+    'https://www.facebook.com/Project.Humanity.eV',
+  ],
+  email: 'info@project-humanity.org',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Lang Str. 40',
+    postalCode: '63486',
+    addressLocality: 'Bruchköbel',
+    addressCountry: 'DE',
+  },
+  areaServed: ['Sudan', 'Afrika'],
   description:
     lang === 'de'
       ? 'Gemeinnütziger Verein, der den ärmsten Menschen in den Slums Afrikas Nahrung, Kleidung, Schulmaterial und medizinische Versorgung bereitstellt.'
       : 'Non-profit association providing food, clothing, school supplies and healthcare to the poorest people in the slums of Africa.',
+  potentialAction: {
+    '@type': 'DonateAction',
+    name: lang === 'de' ? 'Spenden' : 'Donate',
+    target: new URL(localizePath('/spenden', lang), origin).toString(),
+    recipient: { '@type': 'NGO', name: 'Project Humanity e.V.' },
+  },
 };
+
+// Generic breadcrumb trail from the URL path (skipped on the home page).
+const segs = Astro.url.pathname.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
+const isEn = segs[0] === 'en';
+const pathSegs = isEn ? segs.slice(1) : segs;
+const humanize = (s: string) => s.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+let breadcrumbLd: Record<string, unknown> | null = null;
+if (pathSegs.length > 0) {
+  const items = [
+    { name: lang === 'de' ? 'Start' : 'Home', url: new URL(isEn ? '/en' : '/', origin).toString() },
+  ];
+  let acc = isEn ? '/en' : '';
+  pathSegs.forEach((seg, i) => {
+    acc += '/' + seg;
+    const last = i === pathSegs.length - 1;
+    items.push({ name: last ? title : humanize(seg), url: new URL(acc, origin).toString() });
+  });
+  breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((it, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      name: it.name,
+      item: it.url,
+    })),
+  };
+}
 ---
 
 <!doctype html>
@@ -51,8 +102,19 @@ const orgLd = {
     {description && <meta property="og:description" content={description} />}
     <meta property="og:type" content="website" />
     <meta property="og:locale" content={lang === 'de' ? 'de_DE' : 'en_GB'} />
+    <meta property="og:site_name" content={t('site.name')} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    {description && <meta name="twitter:description" content={description} />}
+    <meta name="twitter:image" content={ogImage} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <script type="application/ld+json" is:inline set:html={JSON.stringify(orgLd)} />
+    {breadcrumbLd && <script type="application/ld+json" is:inline set:html={JSON.stringify(breadcrumbLd)} />}
   </head>
   <body class="min-h-screen flex flex-col">
     <a class="skip-link" href="#main">{lang === 'de' ? 'Zum Inhalt springen' : 'Skip to content'}</a>

@@ -14,5 +14,5 @@ Mahlzeiten an drei Ausgabestellen in der Innenstadt. Jede Spende fließt direkt 
 dieses Projekt – den aktuellen Stand siehst du jederzeit auf der
 [Spendenseite](/spenden).
 
-Wenn du mit anpacken möchtest: Wir suchen noch Helfer:innen für die
+Wenn du mit anpacken möchtest: Wir suchen noch Helfer für die
 Abendausgaben. Schreib uns über das [Kontaktformular](/kontakt).

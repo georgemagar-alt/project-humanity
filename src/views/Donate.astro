@@ -1,5 +1,5 @@
 ---
-import { useTranslations, type Lang } from '../i18n/ui';
+import { useTranslations, localizePath, type Lang } from '../i18n/ui';
 import { getPublicCampaigns, type CampaignPublic } from '../lib/db';
 import CampaignList from '../components/CampaignList.astro';
 import DonateWidget from '../components/DonateWidget.astro';
@@ -46,6 +46,15 @@ try {
       {de
         ? 'Hinweis: Die Bestätigungs-E-Mail ist keine Zuwendungsbestätigung im steuerlichen Sinne.'
         : 'Note: the confirmation email is not an official tax donation receipt.'}
+    </p>
+    <p class="mt-2 text-sm">
+      {de ? 'Fragen zur Spende? ' : 'Questions about donating? '}
+      <a
+        href={localizePath('/faq', lang)}
+        class="font-semibold underline decoration-gold underline-offset-4 hover:text-gold-700"
+      >
+        {de ? 'Häufige Fragen' : 'See our FAQ'}
+      </a>
     </p>
   </section>
 </div>
