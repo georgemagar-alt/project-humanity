@@ -27,7 +27,7 @@ const totalRaised = active.reduce((s, c) => s + c.raisedCents, 0);
 const stats = [
   { value: '33,7 Mio.', label: de ? 'Menschen im Sudan brauchen 2026 Hilfe' : 'people in Sudan need aid in 2026' },
   { value: de ? '1 von 4' : '1 in 4', label: de ? 'Menschen im Sudan ist auf der Flucht' : 'people in Sudan is displaced' },
-  { value: '100 %', label: de ? 'jeder Spende fließt in die Projekte' : 'of every donation goes to the projects' },
+  { value: '100 %', label: de ? 'ehrenamtlich – ohne Gehälter oder Verwaltungsapparat' : 'volunteer-run — no salaries or overhead' },
 ];
 ---
 
@@ -146,8 +146,8 @@ const stats = [
       </p>
       <p class="mt-5 text-lg text-muted">
         {de
-          ? 'Christlich motiviert, ehrenamtlich getragen und projektbezogen – mit offener Abrechnung. Als gemeinnütziger Verein stellen wir sicher, dass jede Spende unmittelbar ankommt.'
-          : 'Christian-motivated, volunteer-run and project-based — with open accounting. As a non-profit, we make sure every donation arrives directly.'}
+          ? 'Christlich motiviert, ehrenamtlich getragen und projektbezogen – mit offener Abrechnung. Als rein ehrenamtlicher Verein sorgen wir dafür, dass möglichst viel direkt in die Projekte fließt.'
+          : 'Christian-motivated, volunteer-run and project-based — with open accounting. As an entirely volunteer-run non-profit, we make sure as much as possible goes directly into the projects.'}
       </p>
       <p class="mt-6">
         <a href={localizePath('/was-wir-tun', lang)} class="font-semibold underline decoration-gold underline-offset-4 hover:text-gold-700">
