@@ -1,0 +1,9 @@
+---
+import Base from '../../../layouts/BaseLayout.astro';
+import NewsletterConfirmed from '../../../views/NewsletterConfirmed.astro';
+const lang = 'en' as const;
+---
+
+<Base lang={lang} title="Sign-up confirmed" noindex>
+  <NewsletterConfirmed lang={lang} />
+</Base>

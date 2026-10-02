@@ -1,0 +1,125 @@
+---
+import { localizePath, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  /** "light" for normal pages, "dark" for the footer. */
+  variant?: 'light' | 'dark';
+}
+const { lang, variant = 'light' } = Astro.props;
+const de = lang === 'de';
+const dark = variant === 'dark';
+const privacy = localizePath('/datenschutz', lang);
+
+const s = {
+  placeholder: de ? 'Deine E-Mail-Adresse' : 'Your email address',
+  submit: de ? 'Abonnieren' : 'Subscribe',
+  sending: de ? 'Wird gesendet …' : 'Sending …',
+  success: de
+    ? 'Fast geschafft! Bitte bestätige deine Anmeldung über den Link in der E-Mail, die wir dir gerade geschickt haben.'
+    : 'Almost done! Please confirm your sign-up via the link in the email we just sent you.',
+  error: de
+    ? 'Das hat leider nicht geklappt. Bitte prüfe deine E-Mail-Adresse und die Einwilligung und versuche es erneut.'
+    : 'That didn’t work. Please check your email address and the consent box and try again.',
+};
+
+const inputCls = dark
+  ? 'w-full rounded-md border border-white/20 bg-white/10 px-3 py-2.5 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-gold'
+  : 'field w-full';
+const textCls = dark ? 'text-white/60' : 'text-muted';
+const linkCls = dark ? 'underline hover:text-gold' : 'underline hover:text-gold-700';
+---
+
+<form
+  class="grid gap-3 max-w-xl"
+  data-newsletter-form
+  data-sending={s.sending}
+  data-success={s.success}
+  data-error={s.error}
+  novalidate
+>
+  <input type="hidden" name="locale" value={lang} />
+
+  <div class="flex flex-col sm:flex-row gap-3">
+    <label class="sr-only" for={`nl-email-${variant}`}>{s.placeholder}</label>
+    <input
+      id={`nl-email-${variant}`}
+      type="email"
+      name="email"
+      required
+      autocomplete="email"
+      placeholder={s.placeholder}
+      class={inputCls}
+    />
+    <button type="submit" class="btn shrink-0" data-newsletter-submit>{s.submit}</button>
+  </div>
+
+  <label class={`flex items-start gap-2 text-sm ${textCls}`}>
+    <input type="checkbox" name="consent" required class="mt-1 shrink-0" />
+    <span>
+      {de ? (
+        <>
+          Ich möchte den wöchentlichen Newsletter von Project Humanity e.V. erhalten und willige in die
+          Auswertung von Öffnungen und Klicks ein. Abmeldung jederzeit möglich. Mehr in der{' '}
+          <a href={privacy} class={linkCls}>Datenschutzerklärung</a>.
+        </>
+      ) : (
+        <>
+          I would like to receive the weekly newsletter from Project Humanity e.V. and consent to the
+          analysis of opens and clicks. You can unsubscribe at any time. More in our{' '}
+          <a href={privacy} class={linkCls}>privacy policy</a>.
+        </>
+      )}
+    </span>
+  </label>
+
+  <div class="hp" aria-hidden="true">
+    <label>Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+  </div>
+
+  <p
+    class={`m-0 min-h-[1.2em] text-sm font-semibold data-[kind=error]:text-red-500 ${dark ? 'data-[kind=success]:text-gold' : 'data-[kind=success]:text-gold-700'}`}
+    data-newsletter-status
+    role="status"
+    aria-live="polite"
+  ></p>
+</form>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>('form[data-newsletter-form]').forEach((form) => {
+    const btn = form.querySelector<HTMLButtonElement>('[data-newsletter-submit]')!;
+    const status = form.querySelector<HTMLElement>('[data-newsletter-status]')!;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      status.removeAttribute('data-kind');
+
+      const data = new FormData(form);
+      const email = String(data.get('email') ?? '').trim();
+      if (!form.checkValidity() || !email) {
+        status.dataset.kind = 'error';
+        status.textContent = form.dataset.error ?? '';
+        return;
+      }
+
+      status.textContent = form.dataset.sending ?? '';
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/newsletter', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(Object.fromEntries(data.entries())),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        form.reset();
+        status.dataset.kind = 'success';
+        status.textContent = form.dataset.success ?? '';
+      } catch {
+        status.dataset.kind = 'error';
+        status.textContent = form.dataset.error ?? '';
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
+</script>

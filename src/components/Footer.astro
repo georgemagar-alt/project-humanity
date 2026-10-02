@@ -1,5 +1,6 @@
 ---
 import { useTranslations, localizePath, type Lang } from '../i18n/ui';
+import NewsletterForm from './NewsletterForm.astro';
 
 interface Props {
   lang: Lang;
@@ -23,6 +24,7 @@ const cols: { heading: string; links: { label: string; path: string }[] }[] = [
     links: [
       { label: t('nav.donate'), path: '/spenden' },
       { label: t('nav.join'), path: '/mitglied-werden' },
+      { label: t('nav.newsletter'), path: '/newsletter' },
       { label: t('nav.faq'), path: '/faq' },
       { label: t('nav.contact'), path: '/kontakt' },
     ],
@@ -107,6 +109,22 @@ const linkCls = 'text-white/70 no-underline hover:text-gold transition-colors';
         </ul>
       </nav>
     ))}
+  </div>
+
+  <div class="border-t border-white/10">
+    <div class="container-page py-10 grid gap-6 lg:grid-cols-2 lg:items-start">
+      <div>
+        <h2 class="font-display text-lg font-bold text-white">
+          {lang === 'de' ? 'Einmal pro Woche Post von uns' : 'A letter from us, once a week'}
+        </h2>
+        <p class="mt-2 text-sm text-white/60 max-w-md">
+          {lang === 'de'
+            ? 'Ehrliche, persönliche Einblicke in unsere Arbeit im Sudan und in Afrika – direkt in dein Postfach.'
+            : 'Honest, personal insights into our work in Sudan and Africa – straight to your inbox.'}
+        </p>
+      </div>
+      <NewsletterForm lang={lang} variant="dark" />
+    </div>
   </div>
 
   <div class="border-t border-white/10">

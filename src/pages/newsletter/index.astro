@@ -1,0 +1,13 @@
+---
+import Base from '../../layouts/BaseLayout.astro';
+import Newsletter from '../../views/Newsletter.astro';
+const lang = 'de' as const;
+---
+
+<Base
+  lang={lang}
+  title="Newsletter"
+  description="Der wöchentliche Newsletter von Project Humanity e.V.: ehrliche, persönliche Einblicke in unsere Hilfe im Sudan und in Afrika."
+>
+  <Newsletter lang={lang} />
+</Base>

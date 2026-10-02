@@ -1,0 +1,30 @@
+---
+import { localizePath, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const de = lang === 'de';
+---
+
+<div class="container-page py-16 lg:py-24">
+  <div class="max-w-2xl">
+    <p class="eyebrow">Newsletter</p>
+    <h1 class="text-4xl sm:text-5xl font-bold">
+      {de ? 'Danke – du bist dabei!' : 'Thank you – you’re in!'}
+    </h1>
+    <p class="mt-5 text-lg text-muted">
+      {de
+        ? 'Deine Anmeldung ist bestätigt. Ab jetzt bekommst du einmal pro Woche einen kurzen Brief von uns – über die Menschen im Sudan und in Afrika, über das, was Hilfe bewirkt, und darüber, wie du Teil davon sein kannst.'
+        : 'Your sign-up is confirmed. From now on you will receive a short letter from us once a week – about the people in Sudan and across Africa, what help achieves, and how you can be part of it.'}
+    </p>
+    <p class="mt-4 text-lg text-muted">
+      {de ? 'Schön, dass du da bist.' : 'We’re glad you’re here.'}
+    </p>
+    <div class="mt-9 flex flex-wrap gap-3">
+      <a class="btn" href={localizePath('/spenden', lang)}>{de ? 'Aktuelle Projekte ansehen' : 'See current projects'}</a>
+      <a class="btn btn-outline" href={localizePath('/', lang)}>{de ? 'Zur Startseite' : 'Back to home'}</a>
+    </div>
+  </div>
+</div>

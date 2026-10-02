@@ -16,8 +16,12 @@ export default defineConfig({
     imageService: 'compile',
   }),
   // Generates sitemap-index.xml + sitemap-0.xml for search engines.
-  // /admin and /api are excluded (admin is noindex, api are not pages).
-  integrations: [sitemap({ filter: (page) => !page.includes('/admin') })],
+  // /admin, /api and the newsletter confirmation page are excluded.
+  integrations: [
+    sitemap({
+      filter: (page) => !page.includes('/admin') && !page.includes('/newsletter/bestaetigt'),
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },

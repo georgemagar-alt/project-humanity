@@ -1,0 +1,33 @@
+---
+import { type Lang } from '../i18n/ui';
+import NewsletterForm from '../components/NewsletterForm.astro';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const de = lang === 'de';
+---
+
+<div class="container-page py-16 lg:py-20">
+  <div class="max-w-2xl">
+    <p class="eyebrow">Newsletter</p>
+    <h1 class="text-4xl sm:text-5xl font-bold">
+      {de ? 'Einmal pro Woche Post von uns' : 'A letter from us, once a week'}
+    </h1>
+    <p class="mt-5 text-lg text-muted">
+      {de
+        ? 'In unserem Newsletter erzählen wir dir ehrlich und persönlich, was in unserer Arbeit für die Ärmsten im Sudan und in Afrika passiert: wo Hilfe ankommt, welche Menschen hinter den Zahlen stehen und wie du Teil davon sein kannst.'
+        : 'In our newsletter we tell you, honestly and personally, what is happening in our work for the poorest people in Sudan and across Africa: where help arrives, who the people behind the numbers are, and how you can be part of it.'}
+    </p>
+    <p class="mt-4 text-lg text-muted">
+      {de
+        ? 'Kein Spam, keine Weitergabe deiner Daten – und abmelden kannst du dich jederzeit mit einem Klick.'
+        : 'No spam, no sharing of your data – and you can unsubscribe at any time with one click.'}
+    </p>
+  </div>
+
+  <div class="mt-10">
+    <NewsletterForm lang={lang} />
+  </div>
+</div>

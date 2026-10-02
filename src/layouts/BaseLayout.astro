@@ -11,8 +11,10 @@ interface Props {
   lang: Lang;
   /** Optional per-page social share image (absolute path from site root). */
   image?: string;
+  /** Keep this page out of search engines (e.g. confirmation pages). */
+  noindex?: boolean;
 }
-const { title, description, lang, image } = Astro.props;
+const { title, description, lang, image, noindex } = Astro.props;
 const t = useTranslations(lang);
 const fullTitle = `${title} – ${t('site.name')}`;
 
@@ -94,6 +96,7 @@ if (pathSegs.length > 0) {
     <Font cssVariable="--ff-display" preload />
     <title>{fullTitle}</title>
     {description && <meta name="description" content={description} />}
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
     <link rel="alternate" hreflang="de" href={altDe} />
     <link rel="alternate" hreflang="en" href={altEn} />
