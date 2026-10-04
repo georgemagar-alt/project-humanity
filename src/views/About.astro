@@ -15,6 +15,8 @@ type Copy = { title: string; intro?: string; sections: Section[] };
 const copy: Record<Lang, Copy> = {
   en: {
     title: 'Who we are',
+    intro:
+      'Project Humanity e.V. is a registered non-profit association based in Bruchköbel near Hanau, Germany, founded in December 2015 by Sudanese Christians together with friends. Run entirely by volunteers, it brings food, clothing, school supplies and healthcare to the poorest people in Sudan and the slums of Africa – regardless of religion or tribe.',
     sections: [
       {
         id: 'story',
@@ -46,12 +48,14 @@ const copy: Record<Lang, Copy> = {
   },
   de: {
     title: 'Wer wir sind',
+    intro:
+      'Project Humanity e.V. ist ein gemeinnütziger Verein aus Bruchköbel bei Hanau, im Dezember 2015 von sudanesischen Christen gemeinsam mit Freunden gegründet. Rein ehrenamtlich bringen wir den ärmsten Menschen im Sudan und in den Slums Afrikas Nahrung, Kleidung, Schulmaterial und medizinische Versorgung – unabhängig von Religion oder Volkszugehörigkeit.',
     sections: [
       {
         id: 'story',
         heading: 'Unsere Geschichte',
         body: [
-          'Anfang der 1990er-Jahre verließ eine kleine Gruppe sudanesischer Christen den Sudan. Mit der Zeit wurde ihr Herzensanliegen Wirklichkeit: für Menschen in Not zu sorgen und Gottes Gnade weiterzugeben. Im Dezember 2015 gründeten sie gemeinsam mit einem Kreis von Freundinnen und Freunden den gemeinnützigen Verein Project Humanity e.V.',
+          'Anfang der 1990er-Jahre verließ eine kleine Gruppe sudanesischer Christen den Sudan. Mit der Zeit wurde ihr Herzensanliegen Wirklichkeit: für Menschen in Not zu sorgen und Gottes Gnade weiterzugeben. Im Dezember 2015 gründeten sie gemeinsam mit einem Kreis von Freunden den gemeinnützigen Verein Project Humanity e.V.',
           'Das Team von Project Humanity ist überzeugt, dass Gott uns dazu berufen hat, anderen zu dienen – und dass Geben ein wesentlicher Teil dieser Berufung ist. Aus dieser Überzeugung heraus handelt Project Humanity und setzt sich dafür ein, das Leben von Menschen in Not spürbar zu verändern.',
         ],
       },
@@ -84,6 +88,7 @@ const c = copy[lang];
   <div class="prose-page">
     <p class="eyebrow">{lang === 'de' ? 'Über uns' : 'About us'}</p>
     <h1 class="text-4xl sm:text-5xl font-bold">{c.title}</h1>
+    {c.intro && <p class="mt-5 text-lg text-muted">{c.intro}</p>}
   </div>
 
   <div class="mt-8 mb-12 overflow-clip rounded-[10px] shadow-sm">

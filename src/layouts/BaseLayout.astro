@@ -27,6 +27,7 @@ const ogImage = new URL(image ?? '/og-image.jpg', origin).toString();
 const orgLd = {
   '@context': 'https://schema.org',
   '@type': 'NGO',
+  '@id': new URL('/#organization', origin).toString(),
   name: 'Project Humanity e.V.',
   alternateName: 'Project Humanity',
   url: origin.toString(),
@@ -45,6 +46,20 @@ const orgLd = {
     addressCountry: 'DE',
   },
   areaServed: ['Sudan', 'Afrika'],
+  foundingDate: '2015-12',
+  // Vereinsregister entry (see Impressum).
+  identifier: { '@type': 'PropertyValue', propertyID: 'Vereinsregister Amtsgericht Hanau', value: 'VR 32120' },
+  knowsAbout:
+    lang === 'de'
+      ? ['Humanitäre Hilfe', 'Sudan', 'Armutsbekämpfung', 'Ehrenamt']
+      : ['Humanitarian aid', 'Sudan', 'Poverty relief', 'Volunteering'],
+  contactPoint: {
+    '@type': 'ContactPoint',
+    contactType: lang === 'de' ? 'Allgemeine Anfragen' : 'General enquiries',
+    email: 'info@project-humanity.org',
+    url: new URL(localizePath('/kontakt', lang), origin).toString(),
+    availableLanguage: ['de', 'en'],
+  },
   description:
     lang === 'de'
       ? 'Gemeinnütziger Verein, der den ärmsten Menschen in den Slums Afrikas Nahrung, Kleidung, Schulmaterial und medizinische Versorgung bereitstellt.'
