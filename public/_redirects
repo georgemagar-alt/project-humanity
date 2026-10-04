@@ -1,0 +1,5 @@
+# "Aktuelles" was removed on 2026-10-04; updates now live in the newsletter archive.
+/aktuelles /newsletter 301
+/en/aktuelles /en/newsletter 301
+/aktuelles/* /newsletter 301
+/en/aktuelles/* /en/newsletter 301

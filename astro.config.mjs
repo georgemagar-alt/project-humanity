@@ -16,7 +16,8 @@ export default defineConfig({
     imageService: 'compile',
   }),
   // Generates sitemap-index.xml + sitemap-0.xml for search engines.
-  // /admin, /api and the newsletter confirmation page are excluded.
+  // /admin, /api and the newsletter confirmation page are excluded. Newsletter
+  // issues are rendered live from beehiiv and listed in /sitemap-newsletter.xml.
   integrations: [
     sitemap({
       filter: (page) => !page.includes('/admin') && !page.includes('/newsletter/bestaetigt'),

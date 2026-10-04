@@ -10,9 +10,9 @@ const t = useTranslations(lang);
 const here = Astro.url.pathname.replace(/\/$/, '') || '/';
 
 const items: { key: Parameters<typeof t>[0]; path: string }[] = [
-  { key: 'nav.about', path: '/wer-wir-sind' },
   { key: 'nav.work', path: '/was-wir-tun' },
-  { key: 'nav.news', path: '/aktuelles' },
+  { key: 'nav.about', path: '/wer-wir-sind' },
+  { key: 'nav.newsletter', path: '/newsletter' },
   { key: 'nav.events', path: '/termine' },
   { key: 'nav.contact', path: '/kontakt' },
 ];

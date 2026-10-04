@@ -1,0 +1,16 @@
+---
+import Base from '../../layouts/BaseLayout.astro';
+import NewsletterIssue from '../../views/NewsletterIssue.astro';
+import { getIssue } from '../../lib/beehiiv';
+
+export const prerender = false;
+const lang = 'de' as const;
+
+const issue = await getIssue(Astro.params.slug ?? '');
+if (!issue) return Astro.redirect('/newsletter', 302);
+Astro.response.headers.set('cache-control', 'public, max-age=300');
+---
+
+<Base lang={lang} title={issue.title} description={issue.summary} image={issue.image}>
+  <NewsletterIssue issue={issue} lang={lang} />
+</Base>

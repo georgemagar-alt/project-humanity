@@ -88,6 +88,9 @@
   .prose-page ul { list-style: disc; padding-left: 1.25rem; margin-bottom: 1.1rem; }
   .prose-page li { margin-bottom: .35rem; }
   .prose-page li::marker { color: var(--color-gold-600); }
+  .prose-page img { max-width: 100%; height: auto; border-radius: .75rem; margin: 1.5rem 0; }
+  .prose-page blockquote { border-left: 3px solid var(--color-gold); padding-left: 1rem; margin: 1.5rem 0; font-style: italic; }
+  .prose-page small { display: block; margin: -.5rem 0 1.25rem; color: var(--color-muted); font-size: .9rem; }
 
   .eyebrow {
     display: inline-block;

@@ -4,3 +4,4 @@ Disallow: /admin
 Disallow: /api/
 
 Sitemap: https://project-humanity.org/sitemap-index.xml
+Sitemap: https://project-humanity.org/sitemap-newsletter.xml

@@ -1,6 +1,8 @@
 ---
+export const prerender = false;
 import Base from '../../../layouts/BaseLayout.astro';
 import Newsletter from '../../../views/Newsletter.astro';
+Astro.response.headers.set('cache-control', 'public, max-age=300');
 const lang = 'en' as const;
 ---
 

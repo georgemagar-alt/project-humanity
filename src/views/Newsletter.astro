@@ -1,12 +1,18 @@
 ---
 import { type Lang } from '../i18n/ui';
 import NewsletterForm from '../components/NewsletterForm.astro';
+import { listIssues } from '../lib/beehiiv';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
 const de = lang === 'de';
+
+// Published issues come live from beehiiv. They are written in German, so the
+// English page lists them too (linking to the German pages) and says so.
+const issues = await listIssues();
+const dateFmt = new Intl.DateTimeFormat(de ? 'de-DE' : 'en-GB', { dateStyle: 'long' });
 ---
 
 <div class="container-page py-16 lg:py-20">
@@ -30,4 +36,52 @@ const de = lang === 'de';
   <div class="mt-10">
     <NewsletterForm lang={lang} />
   </div>
+
+  <section class="mt-16 lg:mt-20" aria-labelledby="nl-archive">
+    <h2 id="nl-archive" class="text-3xl sm:text-4xl font-bold">
+      {de ? 'Alle Ausgaben zum Nachlesen' : 'Read past issues'}
+    </h2>
+    {!de && issues.length > 0 && (
+      <p class="mt-3 text-muted">Our newsletter is currently written in German.</p>
+    )}
+
+    {
+      issues.length === 0 ? (
+        <p class="mt-6 text-muted">
+          {de
+            ? 'Die erste Ausgabe erscheint in Kürze. Melde dich an, dann bekommst du sie direkt in dein Postfach.'
+            : 'The first issue is coming soon. Sign up and it will land straight in your inbox.'}
+        </p>
+      ) : (
+        <ul class="mt-8 grid gap-5 sm:grid-cols-2">
+          {issues.map((issue) => {
+            const href = `/newsletter/${encodeURIComponent(issue.slug)}`;
+            return (
+              <li>
+                <article class="card h-full overflow-hidden flex flex-col">
+                  {issue.image && (
+                    <a href={href} tabindex="-1" aria-hidden="true">
+                      <img src={issue.image} alt="" loading="lazy" class="w-full aspect-[1200/630] object-cover" />
+                    </a>
+                  )}
+                  <div class="p-6 flex flex-col flex-1">
+                    <time datetime={issue.date.toISOString()} class="text-sm font-semibold text-muted">
+                      {dateFmt.format(issue.date)}
+                    </time>
+                    <h3 class="mt-1.5 font-display text-xl font-bold">
+                      <a href={href} class="hover:text-gold-700">{issue.title}</a>
+                    </h3>
+                    {issue.summary && <p class="mt-2 text-muted flex-1">{issue.summary}</p>}
+                    <a href={href} class="mt-4 font-semibold text-gold-700 hover:underline">
+                      {de ? 'Lesen' : 'Read'} →
+                    </a>
+                  </div>
+                </article>
+              </li>
+            );
+          })}
+        </ul>
+      )
+    }
+  </section>
 </div>

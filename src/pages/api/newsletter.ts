@@ -1,13 +1,11 @@
 import type { APIRoute } from 'astro';
 import { optionalEnv } from '../../lib/env';
 import { fail, json } from '../../lib/http';
+import { DEFAULT_PUBLICATION_ID } from '../../lib/beehiiv';
 
 export const prerender = false;
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-
-// Not a secret: identifies the beehiiv publication. Can be overridden via env.
-const DEFAULT_PUBLICATION_ID = 'pub_c442fdb5-36fd-438e-aed4-dd54cb7f2431';
 
 /**
  * Newsletter sign-up. The visitor's browser only ever talks to our own server;

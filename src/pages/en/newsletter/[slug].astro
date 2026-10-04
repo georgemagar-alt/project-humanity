@@ -1,0 +1,18 @@
+---
+import Base from '../../../layouts/BaseLayout.astro';
+import NewsletterIssue from '../../../views/NewsletterIssue.astro';
+import { getIssue } from '../../../lib/beehiiv';
+
+export const prerender = false;
+const lang = 'en' as const;
+
+// Issues are written in German; this page shows the German text with English
+// page chrome so the language switcher never leads to a 404. Not indexed.
+const issue = await getIssue(Astro.params.slug ?? '');
+if (!issue) return Astro.redirect('/en/newsletter', 302);
+Astro.response.headers.set('cache-control', 'public, max-age=300');
+---
+
+<Base lang={lang} title={issue.title} description={issue.summary} image={issue.image} noindex>
+  <NewsletterIssue issue={issue} lang={lang} />
+</Base>

@@ -1,0 +1,64 @@
+---
+import { localizePath, type Lang } from '../i18n/ui';
+import NewsletterForm from '../components/NewsletterForm.astro';
+import type { Issue } from '../lib/beehiiv';
+
+interface Props {
+  issue: Issue;
+  lang: Lang;
+}
+const { issue, lang } = Astro.props;
+const de = lang === 'de';
+const fmt = new Intl.DateTimeFormat(de ? 'de-DE' : 'en-GB', { dateStyle: 'long' });
+
+const origin = Astro.site ?? new URL(Astro.url.origin);
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: issue.title,
+  description: issue.summary,
+  datePublished: issue.date.toISOString(),
+  dateModified: issue.date.toISOString(),
+  inLanguage: lang,
+  ...(issue.image && { image: new URL(issue.image, origin).toString() }),
+  mainEntityOfPage: new URL(Astro.url.pathname, origin).toString(),
+  isPartOf: { '@type': 'Periodical', name: 'Project Humanity Newsletter' },
+  author: { '@type': 'Organization', name: 'Project Humanity e.V.', url: origin.toString() },
+  publisher: {
+    '@type': 'Organization',
+    name: 'Project Humanity e.V.',
+    logo: { '@type': 'ImageObject', url: new URL('/logo.svg', origin).toString() },
+  },
+};
+---
+
+<script type="application/ld+json" is:inline set:html={JSON.stringify(articleLd)} />
+
+<div class="container-page py-16 lg:py-20">
+  <article class="prose-page">
+    <p class="mb-6">
+      <a href={localizePath('/newsletter', lang)} class="font-semibold text-gold-700 hover:underline">
+        ← {de ? 'Alle Ausgaben' : 'All issues'}
+      </a>
+    </p>
+    <p class="text-sm font-semibold text-muted">
+      Newsletter ·{' '}
+      <time datetime={issue.date.toISOString()}>{fmt.format(issue.date)}</time>
+    </p>
+    <h1 class="mt-1.5 text-4xl sm:text-5xl font-bold mb-6">{issue.title}</h1>
+    {issue.image && <img src={issue.image} alt="" class="w-full rounded-xl mb-8" />}
+    <div set:html={issue.html} />
+  </article>
+
+  <aside class="card mt-14 p-6 sm:p-8 max-w-[44rem]">
+    <h2 class="font-display text-2xl font-bold">
+      {de ? 'Hat dir dieser Brief gefallen?' : 'Did you enjoy this letter?'}
+    </h2>
+    <p class="mt-2 mb-5 text-muted">
+      {de
+        ? 'Dann melde dich an und bekomm jede Woche die neue Ausgabe direkt in dein Postfach.'
+        : 'Sign up and get each new issue straight to your inbox every week.'}
+    </p>
+    <NewsletterForm lang={lang} />
+  </aside>
+</div>
