@@ -10,7 +10,7 @@
 @theme {
   --color-gold: #f9ae1b;
   --color-gold-600: #e0930a;
-  --color-gold-700: #b9760a;
+  --color-gold-700: #915d08; /* dark enough for small text on paper and sand (WCAG AA 4.5:1) */
 
   --color-ink: #17150f;
   --color-ink-800: #2b2820;
