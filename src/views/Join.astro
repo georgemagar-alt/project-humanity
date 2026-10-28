@@ -8,6 +8,32 @@ interface Props {
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 const de = lang === 'de';
+
+const tasks = de
+  ? [
+      { h: 'Bei Events dabei sein', p: 'Unser Stand auf dem Hanauer Weihnachtsmarkt und anderen Märkten: auf- und abbauen, Schichten übernehmen, mit Besuchern ins Gespräch kommen.' },
+      { h: 'Fahrten übernehmen', p: 'Material abholen, zum Lager oder zur Post bringen.' },
+      { h: 'Fotos, Videos & Social Media', p: 'Bei Events fotografieren und filmen, Reels schneiden, Posts vorbereiten und Kommentare beantworten.' },
+      { h: 'Texte, Übersetzung & Design', p: 'Texte schreiben, ins Englische oder Arabische übersetzen, Flyer und Plakate gestalten.' },
+    ]
+  : [
+      { h: 'Help at events', p: 'Our stand at the Hanau Christmas market and other markets: set up and take down, cover shifts, talk to visitors.' },
+      { h: 'Drive for us', p: 'Pick up supplies, bring them to storage or the post office.' },
+      { h: 'Photos, videos & social media', p: 'Take photos and film at events, edit reels, prepare posts and reply to comments.' },
+      { h: 'Writing, translation & design', p: 'Write texts, translate into English or Arabic, design flyers and posters.' },
+    ];
+
+const promises = de
+  ? [
+      'Du gehst keine Dauerverpflichtung ein. Du hilfst, wann und wie oft es für dich passt.',
+      'Meistens geht es um einzelne Einsätze, vor allem bei Events.',
+      'Sag uns, was du gut kannst. Wir schauen gemeinsam, wo das passt.',
+    ]
+  : [
+      'No long-term commitment. You help when and as often as it suits you.',
+      'It is mostly one-off tasks, especially at events.',
+      'Tell us what you are good at. We will figure out together where it fits.',
+    ];
 ---
 
 <div class="container-page py-16 lg:py-20">
@@ -21,7 +47,28 @@ const de = lang === 'de';
     </p>
   </div>
 
-  <div class="mt-10">
+  <section class="mt-12" aria-labelledby="tasks-h">
+    <h2 id="tasks-h" class="text-2xl font-bold">{de ? 'Was macht man als Mitglied?' : 'What do members do?'}</h2>
+    <div class="mt-6 grid gap-5 sm:grid-cols-2 max-w-4xl">
+      {tasks.map((task) => (
+        <article class="card border-t-4 border-t-gold p-5">
+          <h3 class="font-display text-lg font-bold">{task.h}</h3>
+          <p class="mt-1.5 text-muted">{task.p}</p>
+        </article>
+      ))}
+    </div>
+    <ul class="mt-8 grid gap-2.5 max-w-2xl">
+      {promises.map((p) => (
+        <li class="flex gap-3">
+          <span class="text-gold-700 font-bold" aria-hidden="true">✓</span>
+          <span>{p}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <div class="mt-14">
+    <h2 class="text-2xl font-bold mb-6">{de ? 'Anfrage senden' : 'Send a request'}</h2>
     <MembershipForm lang={lang} />
     <p class="mt-6 text-sm text-muted max-w-xl">
       {de

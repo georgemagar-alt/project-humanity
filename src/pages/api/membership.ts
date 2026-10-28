@@ -7,6 +7,13 @@ export const prerender = false;
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
+const INTEREST_LABELS: Record<string, string> = {
+  events: 'Events',
+  fahrten: 'Fahrten',
+  medien: 'Fotos, Videos & Social Media',
+  texte: 'Texte, Übersetzung & Design',
+};
+
 export const POST: APIRoute = async ({ request }) => {
   const body = await request.json().catch(() => null);
   if (!body) return fail('invalid_json');
@@ -23,7 +30,14 @@ export const POST: APIRoute = async ({ request }) => {
     return fail('invalid_input', 422);
   }
   const phone = body.phone ? String(body.phone).trim().slice(0, 40) || null : null;
-  const message = body.message ? String(body.message).trim().slice(0, 4000) || null : null;
+  const text = body.message ? String(body.message).trim().slice(0, 4000) : '';
+  // Selected help areas are prepended to the message so they show up in the
+  // stored request and the notification email without a schema change.
+  const picked = Array.isArray(body.interests)
+    ? body.interests.map((k: unknown) => INTEREST_LABELS[String(k)]).filter(Boolean)
+    : [];
+  const helpLine = picked.length ? `Möchte helfen bei: ${picked.join(', ')}` : '';
+  const message = [helpLine, text].filter(Boolean).join('\n\n') || null;
 
   try {
     await insertMembershipRequest({ name, email, phone, message, locale });

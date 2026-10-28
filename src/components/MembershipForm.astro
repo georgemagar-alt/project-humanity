@@ -12,6 +12,21 @@ const strings = {
   error: t('join.error'),
 };
 const label = 'grid gap-1.5 font-semibold';
+const de = lang === 'de';
+// Keys must match INTEREST_LABELS in /api/membership.
+const interests = de
+  ? [
+      ['events', 'Bei Events'],
+      ['fahrten', 'Fahrten'],
+      ['medien', 'Fotos, Videos & Social Media'],
+      ['texte', 'Texte, Übersetzung & Design'],
+    ]
+  : [
+      ['events', 'At events'],
+      ['fahrten', 'Driving'],
+      ['medien', 'Photos, videos & social media'],
+      ['texte', 'Writing, translation & design'],
+    ];
 ---
 
 <form class="grid gap-5 max-w-xl" id="join-form" novalidate>
@@ -29,6 +44,19 @@ const label = 'grid gap-1.5 font-semibold';
     {t('join.phone')}
     <input type="tel" name="phone" autocomplete="tel" class="field" />
   </label>
+  <fieldset class="border-0 p-0 m-0">
+    <legend class="font-semibold mb-2">
+      {de ? 'Wobei würdest du gern helfen? (optional)' : 'Where would you like to help? (optional)'}
+    </legend>
+    <div class="grid gap-2">
+      {interests.map(([value, text]) => (
+        <label class="flex items-center gap-2.5 font-medium cursor-pointer">
+          <input type="checkbox" name="interests" value={value} class="w-5 h-5 accent-gold-700" />
+          {text}
+        </label>
+      ))}
+    </div>
+  </fieldset>
   <label class={label}>
     {t('join.message')}
     <textarea name="message" rows="4" class="field"></textarea>
@@ -64,7 +92,8 @@ const label = 'grid gap-1.5 font-semibold';
       status.textContent = cfg.sending;
       btn.disabled = true;
 
-      const payload = Object.fromEntries(new FormData(form).entries());
+      const data = new FormData(form);
+      const payload = { ...Object.fromEntries(data.entries()), interests: data.getAll('interests') };
       try {
         const res = await fetch('/api/membership', {
           method: 'POST',
