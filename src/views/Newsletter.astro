@@ -13,6 +13,8 @@ const de = lang === 'de';
 // English page lists them too (linking to the German pages) and says so.
 const issues = await listIssues();
 const dateFmt = new Intl.DateTimeFormat(de ? 'de-DE' : 'en-GB', { dateStyle: 'long' });
+// Show the latest issues in one row; older ones appear on "show more".
+const VISIBLE = 3;
 ---
 
 <div class="container-page py-16 lg:py-20">
@@ -53,11 +55,11 @@ const dateFmt = new Intl.DateTimeFormat(de ? 'de-DE' : 'en-GB', { dateStyle: 'lo
             : 'The first issue is coming soon. Sign up and it will land straight in your inbox.'}
         </p>
       ) : (
-        <ul class="mt-8 grid gap-5 sm:grid-cols-2">
-          {issues.map((issue) => {
+        <ul class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" id="nl-issues">
+          {issues.map((issue, i) => {
             const href = `/newsletter/${encodeURIComponent(issue.slug)}`;
             return (
-              <li>
+              <li hidden={i >= VISIBLE}>
                 <article class="card h-full overflow-hidden flex flex-col">
                   {issue.image && (
                     <a href={href} tabindex="-1" aria-hidden="true">
@@ -68,7 +70,7 @@ const dateFmt = new Intl.DateTimeFormat(de ? 'de-DE' : 'en-GB', { dateStyle: 'lo
                     <time datetime={issue.date.toISOString()} class="text-sm font-semibold text-muted">
                       {dateFmt.format(issue.date)}
                     </time>
-                    <h3 class="mt-1.5 font-display text-xl font-bold">
+                    <h3 class="mt-1.5 font-display text-lg font-bold">
                       <a href={href} class="hover:text-gold-700">{issue.title}</a>
                     </h3>
                     {issue.summary && <p class="mt-2 text-muted flex-1">{issue.summary}</p>}
@@ -83,5 +85,19 @@ const dateFmt = new Intl.DateTimeFormat(de ? 'de-DE' : 'en-GB', { dateStyle: 'lo
         </ul>
       )
     }
+    {issues.length > VISIBLE && (
+      <div class="mt-8 text-center">
+        <button type="button" class="btn btn-outline" id="nl-more">
+          {de ? 'Ältere Ausgaben anzeigen' : 'Show older issues'}
+        </button>
+      </div>
+    )}
   </section>
 </div>
+
+<script>
+  document.getElementById('nl-more')?.addEventListener('click', (e) => {
+    document.querySelectorAll<HTMLElement>('#nl-issues > li[hidden]').forEach((li) => (li.hidden = false));
+    (e.currentTarget as HTMLElement).parentElement?.remove();
+  });
+</script>
