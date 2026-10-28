@@ -11,7 +11,7 @@ const INTEREST_LABELS: Record<string, string> = {
   events: 'Events',
   fahrten: 'Fahrten',
   medien: 'Fotos, Videos & Social Media',
-  texte: 'Texte, Übersetzung & Design',
+  texte: 'Texte & Design',
 };
 
 export const POST: APIRoute = async ({ request }) => {
