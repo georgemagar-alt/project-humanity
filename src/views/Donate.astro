@@ -25,8 +25,13 @@ try {
     <h1 class="text-4xl sm:text-5xl font-bold">{t('donate.heading')}</h1>
     <p class="mt-4 text-lg text-muted">
       {de
-        ? 'Wähle eine Kampagne und einen Betrag. Die Zahlung läuft über PayPal; der Spendenstand aktualisiert sich sofort.'
-        : 'Pick a campaign and an amount. Payment is handled by PayPal; the total updates immediately.'}
+        ? 'Wähle eine Kampagne und einen Betrag. Online zahlst du per PayPal oder Karte – oder du überweist direkt auf unser Spendenkonto.'
+        : 'Pick a campaign and an amount. Pay online via PayPal or card – or transfer directly to our bank account.'}
+    </p>
+    <p class="mt-3">
+      <a href="#ueberweisung" class="font-semibold underline decoration-gold underline-offset-4 hover:text-gold-700">
+        {de ? 'Lieber per Überweisung spenden ↓' : 'Prefer a bank transfer? ↓'}
+      </a>
     </p>
   </div>
 
@@ -42,7 +47,31 @@ try {
     <div class="mt-6">
       <DonateWidget lang={lang} campaigns={campaigns} />
     </div>
-    <p class="mt-6 text-sm text-muted">
+  </section>
+
+  <section class="mt-14 max-w-xl scroll-mt-24" id="ueberweisung" aria-labelledby="transfer-h">
+    <h2 id="transfer-h" class="text-2xl font-bold">{de ? 'Per Überweisung spenden' : 'Donate by bank transfer'}</h2>
+    <div class="card bg-sand border-line p-5 mt-6">
+      <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5">
+        <dt class="text-muted">{de ? 'Empfänger' : 'Recipient'}</dt>
+        <dd class="font-semibold">Project Humanity e.&nbsp;V.</dd>
+        <dt class="text-muted">Bank</dt>
+        <dd class="font-semibold">Commerzbank</dd>
+        <dt class="text-muted">IBAN</dt>
+        <dd class="font-semibold">DE91 5064 0015 0237 1045 00</dd>
+        <dt class="text-muted">BIC</dt>
+        <dd class="font-semibold">COBADEFFXXX</dd>
+      </dl>
+    </div>
+    <p class="mt-4 text-sm text-muted">
+      {de
+        ? 'Bitte gib im Verwendungszweck die Kampagne an (z. B. „Winterhilfe 2026“) und – falls du eine Spendenbescheinigung möchtest – deinen Namen und deine Adresse.'
+        : 'Please put the campaign in the payment reference (e.g. “Winter Relief 2026”) and – if you would like a donation receipt – your name and address.'}
+    </p>
+  </section>
+
+  <section class="mt-14 max-w-xl">
+    <p class="text-sm text-muted">
       {de
         ? 'Hinweis: Die Bestätigungs-E-Mail ist keine Zuwendungsbestätigung im steuerlichen Sinne.'
         : 'Note: the confirmation email is not an official tax donation receipt.'}

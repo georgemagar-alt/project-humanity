@@ -64,9 +64,15 @@ const i18n = {
             <span data-field="donorsLabel">{t('donate.donors')}</span>
           </p>
 
-          {showDonateLink && (
+          {c.status === 'active' && (
             <div class="mt-6">
-              <a class="btn w-full" href={localizePath('/spenden', lang)}>{t('nav.donate')}</a>
+              <a
+                class={showDonateLink ? 'btn w-full' : 'btn btn-outline w-full'}
+                href={`${localizePath('/spenden', lang)}?kampagne=${c.slug}#donate-form`}
+                data-pick-campaign={c.slug}
+              >
+                {showDonateLink ? t('nav.donate') : lang === 'de' ? 'Für diese Kampagne spenden' : 'Donate to this campaign'}
+              </a>
             </div>
           )}
         </article>

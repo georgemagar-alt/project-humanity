@@ -34,7 +34,7 @@ const strings = {
 const L = de
   ? {
       step1: 'Meine Spende', step2: 'Meine Daten', step3: 'Zahlung',
-      campaign: 'Kampagne', chooseAmount: 'Betrag wählen', custom: 'Anderer Betrag (€)',
+      campaign: 'Wofür möchtest du spenden?', chooseAmount: 'Betrag wählen', custom: 'Anderer Betrag (€)',
       next: 'Weiter', back: 'Zurück', toPayment: 'Weiter zur Zahlung',
       salutation: 'Anrede', title: 'Titel', please: '– bitte wählen –',
       firstName: 'Vorname', lastName: 'Nachname', company: 'Unternehmen (optional)',
@@ -49,7 +49,7 @@ const L = de
     }
   : {
       step1: 'My donation', step2: 'My details', step3: 'Payment',
-      campaign: 'Campaign', chooseAmount: 'Choose an amount', custom: 'Other amount (€)',
+      campaign: 'What would you like to support?', chooseAmount: 'Choose an amount', custom: 'Other amount (€)',
       next: 'Next', back: 'Back', toPayment: 'Continue to payment',
       salutation: 'Salutation', title: 'Title', please: '– please choose –',
       firstName: 'First name', lastName: 'Last name', company: 'Company (optional)',
@@ -93,16 +93,26 @@ const chip =
       {/* Step 1 — amount */}
       <section data-step="1">
         {open.length > 1 && (
-          <label class={label}>
-            {L.campaign}
-            <select id="donate-campaign" name="campaign" class="field">
-              {open.map((c) => (
-                <option value={c.id}>{c.title[lang]}</option>
+          <fieldset class="border-0 p-0 m-0">
+            <legend class="font-semibold mb-2">{L.campaign}</legend>
+            <div class="grid gap-2.5" id="donate-campaigns">
+              {open.map((c, i) => (
+                <label class="flex items-center gap-3 rounded-xl border-2 border-line bg-white px-4 py-3 cursor-pointer hover:border-gold has-[:checked]:border-gold has-[:checked]:bg-sand">
+                  <input
+                    type="radio"
+                    name="campaign"
+                    value={c.id}
+                    data-slug={c.slug}
+                    checked={i === 0}
+                    class="w-5 h-5 shrink-0 accent-gold-700"
+                  />
+                  <span class="font-semibold">{c.title[lang]}</span>
+                </label>
               ))}
-            </select>
-          </label>
+            </div>
+          </fieldset>
         )}
-        {open.length === 1 && <input type="hidden" id="donate-campaign" value={open[0].id} />}
+        {open.length === 1 && <input type="hidden" name="campaign" value={open[0].id} data-slug={open[0].slug} />}
 
         <fieldset class="border-0 p-0 m-0 mt-5">
           <legend class="font-semibold mb-2">{L.chooseAmount}</legend>
@@ -250,7 +260,6 @@ const chip =
     });
 
     const sections = Array.from(form.querySelectorAll<HTMLElement>('[data-step]'));
-    const campaignEl = document.getElementById('donate-campaign') as HTMLSelectElement | HTMLInputElement | null;
     const presetsWrap = document.getElementById('donate-presets');
     const custom = document.getElementById('donate-custom') as HTMLInputElement | null;
     const status = document.getElementById('donate-status') as HTMLElement;
@@ -277,7 +286,24 @@ const chip =
       }
     });
 
-    const currentCampaignId = () => Number(campaignEl?.value || 0);
+    const campaignInputs = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="campaign"]'));
+    const currentCampaignId = () =>
+      Number(campaignInputs.find((i) => i.type === 'hidden' || i.checked)?.value || 0);
+
+    // Preselect a campaign by slug — from ?kampagne=… or a campaign card's button.
+    function pickCampaign(slug: string | null) {
+      const input = campaignInputs.find((i) => i.dataset.slug === slug);
+      if (input && input.type === 'radio') input.checked = true;
+      return Boolean(input);
+    }
+    pickCampaign(new URLSearchParams(location.search).get('kampagne'));
+    document.addEventListener('click', (e) => {
+      const link = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[data-pick-campaign]');
+      if (!link || !pickCampaign(link.dataset.pickCampaign ?? null)) return;
+      e.preventDefault();
+      if (step !== 1) showStep(1);
+      else form.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    });
     const campaignTitle = () => {
       const id = currentCampaignId();
       const found = (cfg.amounts as Array<{ id: number; title: string }>).find((a) => a.id === id);
@@ -417,7 +443,9 @@ const chip =
           currency: 'EUR',
           intent: 'capture',
           components: 'buttons',
-          'disable-funding': 'paylater',
+          // PayPal's SEPA button only leads to a PayPal login for our account;
+          // bank transfer is offered separately on the page instead.
+          'disable-funding': 'paylater,sepa',
         });
         s.src = `https://www.paypal.com/sdk/js?${params.toString()}`;
         s.onload = () => resolve();
