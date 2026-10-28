@@ -31,8 +31,8 @@ export const POST: APIRoute = async ({ request }) => {
   }
   const phone = body.phone ? String(body.phone).trim().slice(0, 40) || null : null;
   const text = body.message ? String(body.message).trim().slice(0, 4000) : '';
-  // Selected help areas are prepended to the message so they show up in the
-  // stored request and the notification email without a schema change.
+  // Selected help areas are prepended to the stored message (no schema change);
+  // the notification email shows them in their own row.
   const picked = Array.isArray(body.interests)
     ? body.interests.map((k: unknown) => INTEREST_LABELS[String(k)]).filter(Boolean)
     : [];
@@ -47,7 +47,14 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   try {
-    await sendMembershipNotification({ name, email, phone, message, locale });
+    await sendMembershipNotification({
+      name,
+      email,
+      phone,
+      interests: picked.join(', ') || null,
+      message: text || null,
+      locale,
+    });
     await sendMembershipAck({ toEmail: email, toName: name, locale });
   } catch (err) {
     console.error('membership email failed', err); // request still succeeds

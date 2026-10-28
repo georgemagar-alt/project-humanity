@@ -99,6 +99,7 @@ export async function sendMembershipNotification(input: {
   name: string;
   email: string;
   phone: string | null;
+  interests: string | null;
   message: string | null;
   locale: Locale;
 }): Promise<void> {
@@ -109,15 +110,19 @@ export async function sendMembershipNotification(input: {
     ['E-Mail', input.email],
     ['Telefon', input.phone ?? '—'],
     ['Sprache', input.locale],
+    ['Möchte helfen bei', input.interests ?? '—'],
     ['Nachricht', input.message ?? '—'],
   ]
-    .map(([k, v]) => `<tr><td style="padding:4px 12px 4px 0;color:#555">${k}</td><td>${escapeHtml(String(v))}</td></tr>`)
+    .map(
+      ([k, v]) =>
+        `<tr><td style="padding:4px 12px 4px 0;color:#555;vertical-align:top;white-space:nowrap">${k}</td><td>${escapeHtml(String(v)).replace(/\n/g, '<br>')}</td></tr>`,
+    )
     .join('');
   const html = `<div style="font-family:system-ui,Arial,sans-serif;font-size:15px">
     <p>Neue Anfrage über das Formular „Mitglied werden“:</p>
     <table>${rows}</table>
   </div>`;
-  const text = `Neue Mitgliedsanfrage:\nName: ${input.name}\nE-Mail: ${input.email}\nTelefon: ${input.phone ?? '—'}\nSprache: ${input.locale}\nNachricht: ${input.message ?? '—'}`;
+  const text = `Neue Mitgliedsanfrage:\nName: ${input.name}\nE-Mail: ${input.email}\nTelefon: ${input.phone ?? '—'}\nSprache: ${input.locale}\nMöchte helfen bei: ${input.interests ?? '—'}\nNachricht: ${input.message ?? '—'}`;
   await sendBrevo({
     to: [{ email: to }],
     subject: `Mitglied werden – Anfrage von ${input.name}`,
